@@ -1,0 +1,11 @@
+Net7\KorboApiBundle\Entity\Basket:
+  exclusion_policy: ALL
+  access_type: public_method
+  virtual_properties:
+    getAvailableLanguages: {}
+    getLanguageCode: {}
+  properties:
+    id:
+      expose: true
+    label:
+      expose: true

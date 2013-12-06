@@ -1,0 +1,25 @@
+Net7\KorboApiBundle\Entity\Item:
+  exclusion_policy: ALL
+  access_type: public_method
+  virtual_properties:
+    getAvailableLanguages: {}
+    getLanguageCode: {}
+  properties:
+    id:
+      expose: true
+    label:
+      accessor:
+        getter: getLabelTranslated
+      expose: true
+    abstract:
+      accessor:
+        getter: getAbstractTranslated
+      expose: true
+    type:
+      expose: true
+    depiction:
+      expose: true
+    basket:
+      accessor:
+        getter: getBasketId
+      expose:  true
