@@ -1,0 +1,59 @@
+#net7_korbo_api_letter_search:
+#  pattern:  /v1/search/letters
+#  defaults: { _controller: Net7KorboApiBundle:Letters:searchLetters}
+#  requirements:
+#    _method: GET
+
+
+swagger_ui:
+  pattern:     /swagger/
+  defaults: { _controller: Net7KorboApiBundle:Utils:swagger }
+
+swagger_ui_file:
+  pattern:     /swagger/{filename}
+  defaults: { _controller: Net7KorboApiBundle:Utils:swagger }
+
+apidocs:
+  pattern:     /api-docs/
+  defaults: { _controller: Net7KorboApiBundle:Utils:apidocs }
+
+apidocs_file:
+  pattern:     /api-docs/{filename}
+  defaults: { _controller: Net7KorboApiBundle:Utils:apidocs }
+
+#net7_korbo_api_letters_options_get:
+#  pattern:  /%korbo_api_prefix%/letters/{id}
+#  defaults: { _controller: Net7KorboApiBundle:Letters:options}
+#  requirements:
+#    _method: OPTIONS
+
+
+baskets:
+  type:     rest
+  resource: Net7\KorboApiBundle\Controller\BasketsController
+  prefix: %korbo_api_prefix%
+
+items:
+  type:     rest
+  parent:   baskets
+  resource: Net7\KorboApiBundle\Controller\ItemsController
+  prefix: %korbo_api_prefix%
+
+
+
+#net7_korbo_api_letter_new:
+#  pattern:  /letters
+#  defaults: { _controller: Net7KorboApiBundle:Letters:post}
+#  requirements:
+#    _method: POST
+#  prefix: %korbo_api_prefix%
+#
+#
+#
+#net7_korbo_api_letters_options:
+#  pattern:  /letters
+#  defaults: { _controller: Net7KorboApiBundle:Letters:coptions}
+#  requirements:
+#    _method: OPTIONS
+#  prefix: %korbo_api_prefix%
+#

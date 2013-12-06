@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+    <project name="Korbo" basedir="." default="build:prepare">
+    <!-- Properties -->
+    <property name="dir.app" value="${project.basedir}/app" />
+    <property name="dir.korbo.bundle" value="/src/Net7/KorbolApiBundle" />
+    <property name="dir.korbo.test" value="${dir.korbo.bundle}/Tests/" />
+    <property name="dir.src" value="${project.basedir}/src" />
+    <property name="dir.build" value="${project.basedir}/app/build" />
+    <property name="dir.reports" value="${dir.build}/logs" />
+    <property name="dir.reports.coverage" value="${dir.reports}/coverage" />
+
+    <!-- Filesets -->
+    <fileset id="sourcecode" dir="${dir.src}">
+        <include name="**/*.php" />
+    </fileset>
+
+    <!-- Project build prepare -->
+    <target name="build:prepare" description="Create build directories.">
+        <echo msg="Creating build directories ..." />
+        <mkdir dir="${dir.build}" />
+        <mkdir dir="${dir.reports}" />
+        <mkdir dir="${dir.reports.coverage}" />
+    </target>
+
+    <!--Project update-->
+    <target name="project:update" description="Updates the project" depends="cache:clear" >
+        <echo msg="Updating composer ..." />
+        <exec command="bin/composer update"/>
+        <echo msg="Updating database ..." />
+        <exec command="php app/console doctrine:schema:update --env=prod --force" logoutput="true"/>
+        <exec command="php app/console doctrine:schema:update --env=test --force" logoutput="true"/>
+    </target>
+
+    <!--Project update-->
+    <target name="cache:clear" description="Clears the cache" depends="cache:clear:dev, cache:clear:prod, cache:clear:test" >
+        <echo msg="Clearing all the cache ..." />
+    </target>
+
+    <!-- Clear cache commands-->
+
+    <target name="cache:clear:prod" description="Clears the prod cache" >
+        <echo msg="Clearing prod cache ..." />
+        <exec command="php app/console cache:clear --env=prod" logoutput="true"/>
+    </target>
+
+    <target name="install:demo" description="Empty DB and install a demo version with the data/fixtures letters" depends="db:clean, cache:clear:prod" >
+        <echo msg="Installing demo version with letters in data/fixtures directory" />
+        <exec command="php app/console korbo:fixtures:load:direct data/fixtures" logoutput="true"/>
+    </target>
+
+    <target name="cache:clear:dev" description="Clears the dev cache" >
+        <echo msg="Clearing dev cache ..." />
+        <exec command="php app/console cache:clear --env=dev" logoutput="true"/>
+    </target>
+
+    <target name="cache:clear:test" description="Clears the test cache" >
+        <echo msg="Clearing test cache ..." />
+        <exec command="php app/console cache:clear --env=test" logoutput="true"/>
+    </target>
+
+    <target name="swagger" description="Generates API docs" >
+        <echo msg="Generating API docs ..." />
+        <exec command="bin/swagger  ${dir.korbo.bundle} -o swagger" logoutput="true"/>
+        <exec command="php app/console korbo:edit-swagger-json" logoutput="true"/>
+    </target>
+
+
+
+    <!--Swagger-->
+  <target name="check:cs" description="Check coding standard" >
+    <echo msg="Checking coding standards ..." />
+    <exec command="bin/phpcs ${dir.src}/Net7" logoutput="true"/>
+  </target>
+
+
+    <!-- Symfony2 code sniffer -->
+    <target name="test:all:coverage" description="Executes all the tests." depends="cache:clear:test">
+        <echo msg="Running all tests with coverage ..." />
+        <exec command="bin/phpunit --coverage-clover ${dir.reports.coverage}/clover.xml --coverage-html ${dir.reports.coverage}/ -c app ${dir.korbo.test}"/>
+    </target>
+
+    <!-- copy/paste detector -->
+    <!--<target name="check:cpd" description="Checks similar code blocks.">-->
+        <!--<echo msg="Checking similar code blocks ..." />-->
+        <!--<phpcpd>-->
+            <!--<fileset refid="sourcecode" />-->
+            <!--<formatter type="pmd" outfile="${dir.reports}/pmd-cpd.xml" />-->
+        <!--</phpcpd>-->
+    <!--</target>-->
+
+  <!--&lt;!&ndash; Mess detector &ndash;&gt;-->
+    <!--<target name="check:md" description="Generate code metrics.">-->
+        <!--<echo msg="Generating code metrics ..." />-->
+        <!--<phpmd rulesets="codesize,unusedcode">-->
+            <!--<fileset refid="sourcecode" />-->
+            <!--<formatter type="xml" outfile="${dir.reports}/pmd.xml" />-->
+        <!--</phpmd>-->
+    <!--</target>-->
+
+  <!-- Code dependency -->
+
+
+    <!-- Tests -->
+    <target name="test:all" description="Executes all the tests." depends="cache:clear:test">
+        <echo msg="Running all tests ..." />
+        <exec command="php bin/phpunit -c app ${dir.korbo.test}" logoutput="true"/>
+    </target>
+
+
+    <!--   Install task
+
+            # php app/console doctrine:database:create \-\-env=test
+            # php app/console doctrine:database:create
+
+            All build:
+            # php app/console doctrine:schema:update \-\-force \-\-env=test
+            # php app/console doctrine:schema:update \-\-force
+        -->
+    <target name="project:install" description="Install the project" depends="project:install:info">
+        <exec command="php app/console doctrine:database:create --env=test" logoutput="true"/>
+        <exec command="php app/console doctrine:database:create" logoutput="true"/>
+        <exec command="php app/console doctrine:schema:update --force --env=test" logoutput="true"/>
+        <exec command="php app/console doctrine:schema:update --force" logoutput="true"/>
+
+        <exec command="bin/swagger  ${dir.korbo.bundle} -o swagger" logoutput="true"/>
+
+        <!-- loading fixtures TODO -->
+
+    </target>
+
+    <target name="db:clean" description="Remove all  data from DB">
+        <exec command="php app/console doctrine:schema:drop --force --env=test" logoutput="true"/>
+        <exec command="php app/console doctrine:schema:drop --force" logoutput="true"/>
+        <exec command="php app/console doctrine:schema:create --env=test" logoutput="true"/>
+        <exec command="php app/console doctrine:schema:create" logoutput="true"/>
+
+        <!-- loading fixtures TODO -->
+
+    </target>
+
+    <target name="project:install:info" description="Prints the installation steps to follow">
+        <echo msg="Launch composer update" />
+        <echo msg="php bin/composer update" />
+        <echo msg="" />
+        <echo msg="To make swagger work, Apache needs to have the “headers” module enabled:" />
+        <echo msg="# a2enmod headers" />
+        <echo msg="" />
+        <echo msg="To make the Symfony2 app work, you will need mod_rewrite:" />
+        <echo msg="# a2enmod rewrite" />
+        <echo msg="# service apache2 restart" />
+        <echo msg="" />
+        <echo msg="To properly configure the application you will need _TO CREATE_ the following configuration files:" />
+        <echo msg="# /conf/config.yml" />
+        <echo msg="# /conf/config_test.yml" />
+        <echo msg="" />
+        <echo msg="In the /conf directory there are some distribution examples (/conf/dist/*-dist.yml files). To initialize your project you can copy those:" />
+        <echo msg="# cp conf/{demo|prod|dist}/config-dist.yml conf/config.yml" />
+        <echo msg="# cp conf/{demo|prod|dist}/config_test-dist.yml conf/config_test.yml" />
+        <echo msg="Note: The first time you install korbo you *must* overwrite the config.yml file even if it has been created by composer." />
+        <echo msg="" />
+        <echo msg="" />
+        <echo msg="Create a virtual host for the application, like:" />
+        <echo msg="" />
+        <echo msg="VirtualHost *:80\" />
+        <echo msg='  DocumentRoot /path/to/korbo/web/"' />
+        <echo msg="  ServerName korbo.local" />
+        <echo msg='  ErrorLog "/var/log/apache2/korbo_error.log"' />
+        <echo msg='  CustomLog "/var/log/apache2/korbo_access.log" common' />
+        <echo msg='  Directory "/path/to/korbo/web/"' />
+        <echo msg="    Options FollowSymLinks" />
+        <echo msg="    AllowOverride All" />
+        <echo msg="    Allow from All" />
+        <echo msg="  /Directory" />
+        <echo msg="/VirtualHost" />
+        <echo msg="" />
+        <echo msg="chmod /app/logs to something writable by the webserver." />
+        <echo msg="chmod /app/cache to something writable by the webserver." />
+    </target>
+
+
+</project>
