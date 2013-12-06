@@ -12,7 +12,7 @@ web/bundles/*
 /app/logs/*
 
 /swagger/*.json
-/swagger/swagger-openpal-conf.js
+/swagger/swagger-korbo-conf.js
 
 conf/config_test.yml
 conf/parameters.yml
