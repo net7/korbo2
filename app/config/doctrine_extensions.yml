@@ -1,7 +1,7 @@
 services:
     # KernelRequest listener
     extension.listener:
-        class: Net7\OpenpalApiBundle\EventListener\DoctrineExtensionListener
+        class: Net7\KorboApiBundle\EventListener\DoctrineExtensionListener
         calls:
             - [ setContainer, [ @service_container ] ]
         tags:
