@@ -95,9 +95,9 @@ class BasketsControllerTest extends WebTestCase
     /**
      * Modify stored basket
      */
-    public function testModifyLetter(){
+    public function testModifyBasket(){
 
-        $postedLetterLocation = $this->loadBaskets(1);
+        $this->loadBaskets(1);
 
         $client = static::createClient();
 
