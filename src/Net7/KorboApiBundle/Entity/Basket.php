@@ -17,6 +17,11 @@ use Net7\KorboApiBundle\Entity\ItemTranslation;
  *
  * @ORM\Table(name="basket")
  * @ORM\Entity
+ *
+ *  * @SWG\Model(
+ *      id="Basket",
+ *      required="['id']"
+ * )
  */
 class Basket
 {

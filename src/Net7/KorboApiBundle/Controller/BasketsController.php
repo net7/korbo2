@@ -139,6 +139,44 @@ class BasketsController extends KorboController{
      * @param Request $request
      * 
      * @return Response
+     *
+     *  *  @SWG\Api(
+     *   path="/baskets",
+     *   description="Baskets entities",
+     *   @SWG\Operations(@SWG\Operation(
+     *          method="POST",
+     *          summary="Creates a new Basket",
+     *          notes="Creates a new Basket with the label passed as parameter.
+     *                 Returns status code 201 and the resource url in the Location Header.
+     *                 When a new Basket is created only the label parameter is mandatory.
+     *                 When an Basket is modified both id and label parameter are mandatory.
+     *                 Any ISO 639-1 value is supported.",
+     *          nickname="createBasket",
+     *          @SWG\Parameters(
+     *              @SWG\Parameter(
+     *                  name="id",
+     *                  description="Id of the basket",
+     *                  paramType="query",
+     *                  required=true,
+     *                  format="integer",
+     *                  type="string"
+     *              ),
+     *              @SWG\Parameter(
+     *                  name="label",
+     *                  description="Label of the basket,",
+     *                  paramType="query",
+     *                  required=true,
+     *                  format="string",
+     *                  type="string"
+     *              )
+     *          ),
+     *          @SWG\ResponseMessage(code=201, message="Resource created. New URL in the Location Header"),
+     *          @SWG\ResponseMessage(code=204, message="Resource modified. Empty body"),
+     *          @SWG\ResponseMessage(code=400, message="Empty request: no basket-id or id specified"),
+     *          @SWG\ResponseMessage(code=405, message="Method not allowed")
+     *     )
+     *   )
+     *  )
      */
     public function postAction(Request $request)
     {

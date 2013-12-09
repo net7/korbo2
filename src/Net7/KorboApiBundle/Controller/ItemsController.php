@@ -112,7 +112,7 @@ class ItemsController extends KorboI18NController {
      * @return Response
      *
      *  @SWG\Api(
-     *   path="/items",
+     *   path="/baskets/{basketId}/items",
      *   description="Item entities",
      *   @SWG\Operations(@SWG\Operation(
      *          method="POST",
@@ -127,10 +127,18 @@ class ItemsController extends KorboI18NController {
      *          nickname="createItem",
      *          @SWG\Parameters(
      *              @SWG\Parameter(
+     *                  name="basketId",
+     *                  description="Basket id",
+     *                  paramType="path",
+     *                  required=true,
+     *                  format="integer",
+     *                  type="string"
+     *              ),
+     *              @SWG\Parameter(
      *                  name="id",
      *                  description="Id of the item",
      *                  paramType="query",
-     *                  required="false",
+     *                  required=false,
      *                  format="integer",
      *                  type="string"
      *              ),
@@ -138,7 +146,7 @@ class ItemsController extends KorboI18NController {
      *                  name="label",
      *                  description="Label of the item,",
      *                  paramType="query",
-     *                  required="false",
+     *                  required=false,
      *                  format="string",
      *                  type="string"
      *              ),
@@ -146,7 +154,7 @@ class ItemsController extends KorboI18NController {
      *                  name="Content-Language",
      *                  description="Language of the item, ISO 639-1 code (en, it, de, ..)",
      *                  paramType="header",
-     *                  required="false",
+     *                  required=false,
      *                  type="string",
      *                  enum="['en', 'it', 'de']"
      *              ),
@@ -154,7 +162,7 @@ class ItemsController extends KorboI18NController {
      *                  name="abstract",
      *                  description="Abstract of the item",
      *                  paramType="query",
-     *                  required="false",
+     *                  required=false,
      *                  format="string",
      *                  type="string"
      *              ),
@@ -162,15 +170,15 @@ class ItemsController extends KorboI18NController {
      *                  name="depiction",
      *                  description="Depiction of the item...should be an URL",
      *                  paramType="query",
-     *                  required="false",
+     *                  required=false,
      *                  format="string",
      *                  type="string"
      *              ),
      *              @SWG\Parameter(
-     *                  name="receivingPlace",
+     *                  name="type",
      *                  description="Types of the Item",
      *                  paramType="query",
-     *                  required="false",
+     *                  required=false,
      *                  format="string",
      *                  type="array"
      *              )

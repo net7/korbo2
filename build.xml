@@ -2,7 +2,7 @@
     <project name="Korbo" basedir="." default="build:prepare">
     <!-- Properties -->
     <property name="dir.app" value="${project.basedir}/app" />
-    <property name="dir.korbo.bundle" value="/src/Net7/KorbolApiBundle" />
+    <property name="dir.korbo.bundle" value="src/Net7/KorboApiBundle" />
     <property name="dir.korbo.test" value="${dir.korbo.bundle}/Tests/" />
     <property name="dir.src" value="${project.basedir}/src" />
     <property name="dir.build" value="${project.basedir}/app/build" />
