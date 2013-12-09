@@ -8,12 +8,20 @@ namespace Net7\KorboApiBundle\Controller;
 
 use Doctrine\ORM\AbstractQuery;
 use FOS\RestBundle\Controller\FOSRestController;
+
+use Net7\KorboApiBundle\Entity\Basket;
+
+use Net7\KorboApiBundle\Entity\Item;
 use Symfony\Component\HttpFoundation\Request,
     Symfony\Component\HttpFoundation\Response,
     Symfony\Component\HttpFoundation\AcceptHeader,
     Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\Routing\ClassResourceInterface,
+    FOS\RestBundle\Controller\Annotations\RouteResource,
+    FOS\RestBundle\Request\ParamFetcherInterface,
+    FOS\RestBundle\Controller\Annotations as Rest;
+
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Swagger\Annotations as SWG;
@@ -35,7 +43,7 @@ use Symfony\Component\Security\Acl\Exception\Exception;
  * )
  *
  */
-class ItemsController extends KorboController{
+class ItemsController extends KorboI18NController {
 
     /**
      * The method is called when OPTIONS Header is set.
@@ -71,25 +79,10 @@ class ItemsController extends KorboController{
      * @return Response
      *
      *
-     *  @SWG\Api(
-     *   path="/baskets",
-     *   @SWG\Operations(
-     *      @SWG\Operation(
-     *          produces="['application/json', 'text/html']",
-     *          method="GET",
-     *          type="array",
-     *          @SWG\Items("Basket"),
-     *          summary="Retrieves the baskets index",
-     *          notes="Retrieves the list of all the baskets present in the store. All the baskets attributes are contained into the response",
-     *          nickname="retrieveBaskets",
-     *          @SWG\ResponseMessage(code=204, message="There is no representation for the requested item - only JSON is supported"),
-     *     )
-     *   )
-     *  )
-     *
      */
     public function cgetAction(Request $request)
     {
+        die("asdf");
        return $this->response;
     } // "get_items"     [GET] /items
 
@@ -107,14 +100,130 @@ class ItemsController extends KorboController{
 
 
     public function getAction($id, Request $request)
-    {
+    {die("asdf111");
         return $this->response;
     } // "get_item"      [GET] /items/{slug}
 
 
 
+    /**
+     * @param Request $request
+     *
+     * @return Response
+     *
+     *  @SWG\Api(
+     *   path="/items",
+     *   description="Item entities",
+     *   @SWG\Operations(@SWG\Operation(
+     *          method="POST",
+     *          summary="Creates a new Item",
+     *          notes="Creates a new Item with the content passed as parameter.
+     *                 Returns status code 201 and the resource url in the Location Header.
+     *                 The header 'Content-Language' specifies the language of the item being sent.
+     *                 If id is specified the resource identified by the id will be modified.
+     *                 When a new Item is created only the content parameter is mandatory.
+     *                 When an Item is modified only the id parameter is mandatory.
+     *                 Any ISO 639-1 value is supported.",
+     *          nickname="createItem",
+     *          @SWG\Parameters(
+     *              @SWG\Parameter(
+     *                  name="id",
+     *                  description="Id of the item",
+     *                  paramType="query",
+     *                  required="false",
+     *                  format="integer",
+     *                  type="string"
+     *              ),
+     *              @SWG\Parameter(
+     *                  name="label",
+     *                  description="Label of the item,",
+     *                  paramType="query",
+     *                  required="false",
+     *                  format="string",
+     *                  type="string"
+     *              ),
+     *              @SWG\Parameter(
+     *                  name="Content-Language",
+     *                  description="Language of the item, ISO 639-1 code (en, it, de, ..)",
+     *                  paramType="header",
+     *                  required="false",
+     *                  type="string",
+     *                  enum="['en', 'it', 'de']"
+     *              ),
+     *              @SWG\Parameter(
+     *                  name="abstract",
+     *                  description="Abstract of the item",
+     *                  paramType="query",
+     *                  required="false",
+     *                  format="string",
+     *                  type="string"
+     *              ),
+     *              @SWG\Parameter(
+     *                  name="depiction",
+     *                  description="Depiction of the item...should be an URL",
+     *                  paramType="query",
+     *                  required="false",
+     *                  format="string",
+     *                  type="string"
+     *              ),
+     *              @SWG\Parameter(
+     *                  name="receivingPlace",
+     *                  description="Types of the Item",
+     *                  paramType="query",
+     *                  required="false",
+     *                  format="string",
+     *                  type="array"
+     *              )
+     *          ),
+     *          @SWG\ResponseMessage(code=201, message="Resource created. New URL in the Location Header"),
+     *          @SWG\ResponseMessage(code=204, message="Resource modified. Empty body"),
+     *          @SWG\ResponseMessage(code=400, message="Empty request: no basket-id or id specified"),
+     *          @SWG\ResponseMessage(code=405, message="Method not allowed")
+     *     )
+     *   )
+     *  )
+     */
     public function postAction(Request $request)
     {
+        // empty request 400 - basket not specified and not edit mode
+        if ($request->get("basketId", false) === false && $request->get("id", false) === false) {
+            $this->response->setStatusCode(400);
+
+            return $this->response;
+        }
+
+        $em = $this->getDoctrine()->getManager();
+
+        $basket = $em->find("Net7KorboApiBundle:Basket", $request->get('basketId'));
+
+        // if the id parameter is present we modify an existing item...otherwise we will create a new one
+        $item = ( ($id = $request->get("id", false) ) === false) ? new Item() : $em->find("Net7KorboApiBundle:Item", $id);
+
+        $item->setBasket($basket);
+        $this->checkAndSetTranslation($item, 'label', $request);
+        $this->checkAndSetTranslation($item, 'abstract', $request);
+
+        // at the beginning the depiction is an url
+        $this->checkAndSetField('depiction', $request, $item);
+        $this->checkAndSetField('type', $request, $item, array());
+
+        $em->persist($item);
+        $em->flush();
+
+        // new item persisted
+        if ($id === false) {
+            $this->response->setStatusCode(201);
+
+            $this->response->headers->set('Location',
+                $this->generateUrl(
+                    'get_item', array('id' => $item->getId()),
+                    true // absolute
+                )
+            );
+        } else {
+            // modified item
+            $this->response->setStatusCode(204);
+        }
         return $this->response;
     } // "post_items"    [POST] /items
 

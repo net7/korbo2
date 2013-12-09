@@ -2,3 +2,7 @@ net7_korbo_api:
     resource: "@Net7KorboApiBundle/Resources/config/routing.yml"
     prefix:   /
 
+#baskets:
+#  type:     rest
+#  prefix:   /v1
+#  resource: "@Net7KorboApiBundle/Resources/config/routing.yml"

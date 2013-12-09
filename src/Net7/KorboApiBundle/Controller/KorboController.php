@@ -19,22 +19,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Swagger\Annotations as SWG;
 use Symfony\Component\Security\Acl\Exception\Exception;
 
-/**
- * Baskets Api Controller
- *
- * @RouteResource("Basket")
- *
- * @SWG\Model(id="Basket")
- *
- * @SWG\Resource(
- *    resourcePath="/baskets",
- *    swaggerVersion="1.2",
- *    apiVersion="0.0.1",
- *    description="Basket entities",
- *    basePath="http://korbo2.local"
- * )
- *
- */
+
 class KorboController extends Controller {
 
     /**

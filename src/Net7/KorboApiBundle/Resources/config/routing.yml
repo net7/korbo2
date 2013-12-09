@@ -33,20 +33,20 @@ baskets:
   resource: Net7\KorboApiBundle\Controller\BasketsController
   prefix: %korbo_api_prefix%
 
-#items:
-#  type:     rest
-#  parent:   baskets
-#  resource: Net7\KorboApiBundle\Controller\ItemsController
-#  prefix: %korbo_api_prefix%
+items:
+  type:     rest
+  #parent:   baskets
+  resource: Net7\KorboApiBundle\Controller\ItemsController
+  prefix: %korbo_api_prefix%
 
 
 
-#net7_korbo_api_letter_new:
-#  pattern:  /letters
-#  defaults: { _controller: Net7KorboApiBundle:Letters:post}
-#  requirements:
-#    _method: POST
-#  prefix: %korbo_api_prefix%
+net7_korbo_api_item_new:
+  pattern:  /v1/baskets/{basketId}/items
+  defaults: { _controller: Net7KorboApiBundle:Items:post}
+  requirements:
+    _method: POST
+
 #
 #
 #
