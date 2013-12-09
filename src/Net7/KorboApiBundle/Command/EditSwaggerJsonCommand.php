@@ -26,7 +26,7 @@ class EditSwaggerJsonCommand extends ContainerAwareCommand
         parent::configure();
 
         $this
-            ->setName('korbo2:edit-swagger-json')
+            ->setName('korbo:edit-swagger-json')
             //->addArgument('type', InputArgument::REQUIRED, 'Type')
             //->addOption('country', 'c', InputOption::VALUE_OPTIONAL, 'Country', '')
 
@@ -52,14 +52,14 @@ class EditSwaggerJsonCommand extends ContainerAwareCommand
 
         $swaggerRoot = $this->getContainer()->get('kernel')->getRootDir() . '/../swagger/';
 
-        $swaggerLetterConfigFile = $swaggerRoot . 'letters.json';
-        $swaggerJson = json_decode(file_get_contents($swaggerLetterConfigFile), true);
+        $swaggerItemsConfigFile = $swaggerRoot . 'items.json';
+        $swaggerJson = json_decode(file_get_contents($swaggerItemsConfigFile), true);
 
         $basePath = $this->getContainer()->getParameter('swagger_base_path');
         $apiPrefix = $this->getContainer()->getParameter('korbo_api_prefix');
         $swaggerJson['basePath'] = $basePath . '/' . $apiPrefix;
 
-        file_put_contents($swaggerLetterConfigFile, json_encode($swaggerJson, JSON_PRETTY_PRINT));
+        file_put_contents($swaggerItemsConfigFile, json_encode($swaggerJson, JSON_PRETTY_PRINT));
         $output->write("Korbo2: Base Path changed correctly to {$basePath}", true);
         // Generates a config file for the UI, to have it ready and configured
         // for this instance korbo2
