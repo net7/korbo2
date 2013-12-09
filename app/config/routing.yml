@@ -1,4 +1,4 @@
-net7_openpal_api:
+net7_korbo_api:
     resource: "@Net7KorboApiBundle/Resources/config/routing.yml"
     prefix:   /
 

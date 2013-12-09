@@ -33,11 +33,11 @@ baskets:
   resource: Net7\KorboApiBundle\Controller\BasketsController
   prefix: %korbo_api_prefix%
 
-items:
-  type:     rest
-  parent:   baskets
-  resource: Net7\KorboApiBundle\Controller\ItemsController
-  prefix: %korbo_api_prefix%
+#items:
+#  type:     rest
+#  parent:   baskets
+#  resource: Net7\KorboApiBundle\Controller\ItemsController
+#  prefix: %korbo_api_prefix%
 
 
 

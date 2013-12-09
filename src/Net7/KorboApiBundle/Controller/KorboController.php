@@ -63,6 +63,7 @@ class KorboController extends Controller {
         $this->response->headers->set('Access-Control-Allow-Origin', "*");
     }
 
+
     /**
      * Gets and sort language headers
      *
@@ -96,5 +97,23 @@ class KorboController extends Controller {
         }
 
         return $this->container->getParameter('openpal_default_locale');
+    }
+
+    protected function checkAndSetField($fieldName, Request $request, $obj, $defaultValue = 'null')
+    {
+        $functionName = "set" . ucfirst($fieldName);
+
+        if ($request->get($fieldName, false) !== false) {
+            if ($defaultValue !== 'null') {
+                // NOTICE: unescaped slash work sonly with php >= 5.4
+                if (is_array($defaultValue)) {
+                    $obj->$functionName(json_encode($request->get($fieldName, $defaultValue), JSON_UNESCAPED_SLASHES));
+                } else {
+                    $obj->$functionName( $request->get($fieldName, $defaultValue) );
+                }
+            } else {
+                $obj->$functionName( $request->get($fieldName) );
+            }
+        }
     }
 }

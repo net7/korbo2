@@ -3,7 +3,7 @@
 namespace Net7\KorboApiBundle\EventListener;
 
 
-use Net7\KorboApiBundle\Controller\LettersController;
+use Net7\KorboApiBundle\Controller\KorboController;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
@@ -33,7 +33,7 @@ class ApiRequestListener
         }
 
         $controllerObject = $controller[0];
-        if ($controllerObject instanceof LettersController) {
+        if ($controllerObject instanceof KorboController) {
 
             // call a kind of pre-execute method
             $controllerObject->initialize($event->getRequest());

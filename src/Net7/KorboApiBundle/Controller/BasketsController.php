@@ -8,12 +8,19 @@ namespace Net7\KorboApiBundle\Controller;
 
 use Doctrine\ORM\AbstractQuery;
 use FOS\RestBundle\Controller\FOSRestController;
+
+use Net7\KorboApiBundle\Entity\Basket;
+
 use Symfony\Component\HttpFoundation\Request,
     Symfony\Component\HttpFoundation\Response,
     Symfony\Component\HttpFoundation\AcceptHeader,
     Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\Routing\ClassResourceInterface,
+    FOS\RestBundle\Controller\Annotations\RouteResource,
+    FOS\RestBundle\Request\ParamFetcherInterface,
+    FOS\RestBundle\Controller\Annotations as Rest;
+
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Swagger\Annotations as SWG;
@@ -70,29 +77,12 @@ class BasketsController extends KorboController{
      *
      * @return Response
      *
-     *
-     *  @SWG\Api(
-     *   path="/baskets",
-     *   @SWG\Operations(
-     *      @SWG\Operation(
-     *          produces="['application/json', 'text/html']",
-     *          method="GET",
-     *          type="array",
-     *          @SWG\Items("Basket"),
-     *          summary="Retrieves the baskets index",
-     *          notes="Retrieves the list of all the baskets present in the store. All the baskets attributes are contained into the response",
-     *          nickname="retrieveBaskets",
-     *          @SWG\ResponseMessage(code=204, message="There is no representation for the requested basket - only JSON is supported"),
-     *     )
-     *   )
-     *  )
-     *
      */
     public function cgetAction(Request $request)
     {
         // TODO: only json accepted at the moment
         // no content: there is no representation for the requested resource
-        if (!$this->accept->has('application/json')) {
+        /*if (!$this->accept->has('application/json')) {
             $this->response->setStatusCode(204);
 
             return $this->response;
@@ -122,7 +112,7 @@ class BasketsController extends KorboController{
 
         $this->response->setContent($jsonContent);
         $this->response->headers->set('Content-Type', 'application/json');
-
+        */
         return $this->response;
     } // "get_baskets"     [GET] /baskets
 
@@ -145,9 +135,45 @@ class BasketsController extends KorboController{
     } // "get_basket"      [GET] /baskets/{slug}
 
 
-
+    /**
+     * @param Request $request
+     * 
+     * @return Response
+     */
     public function postAction(Request $request)
     {
+        // empty request 400 - empty content and not edit mode
+        if ($request->get("label", false) === false && $request->get("id", false) === false) {
+            $this->response->setStatusCode(400);
+
+            return $this->response;
+        }
+
+        $em = $this->getDoctrine()->getManager();
+
+        // if the id parameter is present we modify an existing basket...otherwise we will create a new basket
+        $basket = ( ($id = $request->get("id", false) ) === false) ? new Basket() : $em->find("Net7KorboApiBundle:Basket", $id);
+
+        $this->checkAndSetField('label', $request, $basket);
+
+        $em->persist($basket);
+        $em->flush();
+
+        // new basket persisted
+        if ($id === false) {
+            $this->response->setStatusCode(201);
+
+            $this->response->headers->set('Location',
+                $this->generateUrl(
+                    'get_basket', array('id' => $basket->getId()),
+                    true // absolute
+                )
+            );
+        } else {
+            // modified basket
+            $this->response->setStatusCode(204);
+        }
+
         return $this->response;
     } // "post_baskets"    [POST] /baskets
 
