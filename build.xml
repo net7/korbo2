@@ -43,11 +43,6 @@
         <exec command="php app/console cache:clear --env=prod" logoutput="true"/>
     </target>
 
-    <target name="install:demo" description="Empty DB and install a demo version with the data/fixtures letters" depends="db:clean, cache:clear:prod" >
-        <echo msg="Installing demo version with letters in data/fixtures directory" />
-        <exec command="php app/console korbo:fixtures:load:direct data/fixtures" logoutput="true"/>
-    </target>
-
     <target name="cache:clear:dev" description="Clears the dev cache" >
         <echo msg="Clearing dev cache ..." />
         <exec command="php app/console cache:clear --env=dev" logoutput="true"/>
@@ -78,27 +73,6 @@
         <echo msg="Running all tests with coverage ..." />
         <exec command="bin/phpunit --coverage-clover ${dir.reports.coverage}/clover.xml --coverage-html ${dir.reports.coverage}/ -c app ${dir.korbo.test}"/>
     </target>
-
-    <!-- copy/paste detector -->
-    <!--<target name="check:cpd" description="Checks similar code blocks.">-->
-        <!--<echo msg="Checking similar code blocks ..." />-->
-        <!--<phpcpd>-->
-            <!--<fileset refid="sourcecode" />-->
-            <!--<formatter type="pmd" outfile="${dir.reports}/pmd-cpd.xml" />-->
-        <!--</phpcpd>-->
-    <!--</target>-->
-
-  <!--&lt;!&ndash; Mess detector &ndash;&gt;-->
-    <!--<target name="check:md" description="Generate code metrics.">-->
-        <!--<echo msg="Generating code metrics ..." />-->
-        <!--<phpmd rulesets="codesize,unusedcode">-->
-            <!--<fileset refid="sourcecode" />-->
-            <!--<formatter type="xml" outfile="${dir.reports}/pmd.xml" />-->
-        <!--</phpmd>-->
-    <!--</target>-->
-
-  <!-- Code dependency -->
-
 
     <!-- Tests -->
     <target name="test:all" description="Executes all the tests." depends="cache:clear:test">
