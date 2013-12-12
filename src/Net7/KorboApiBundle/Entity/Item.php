@@ -57,6 +57,15 @@ class Item
     /**
      * @var string
      *
+     * @Solr\Field(type="string")
+     *
+     * @ORM\Column(name="resource", type="string")
+     */
+    private $resource;
+
+    /**
+     * @var string
+     *
      * @ Solr\Field(type="string")
      *
      * @ Gedmo\Translatable
@@ -130,9 +139,31 @@ class Item
     }
 
     /**
+     * Sets the resource
+     *
+     * @param string $resource
+     */
+    public function setResource($resource)
+    {
+        $this->resource = $resource;
+    }
+
+    /**
+     * Return the resource
+     *
+     * @return string
+     */
+    public function getResource()
+    {
+        return $this->resource;
+    }
+
+
+
+    /**
      * Sets the basket associated to the Item
      *
-     * @param $basket
+     * @param Basket $basket
      */
     public function setBasket($basket)
     {
@@ -193,7 +224,7 @@ class Item
      * Sets a new translation for the item
      *
      * @param ItemTranslation $t
-     * @param integer           $translationIndex
+     * @param integer         $translationIndex
      */
     public function addTranslation(ItemTranslation $t, $translationIndex = null)
     {
@@ -304,7 +335,7 @@ class Item
     }
 
     /**
-     * @param json $type
+     * @param string $type [json representation]
      */
     public function setType($type)
     {

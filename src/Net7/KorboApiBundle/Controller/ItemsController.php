@@ -12,6 +12,7 @@ use FOS\RestBundle\Controller\FOSRestController;
 use Net7\KorboApiBundle\Entity\Basket;
 
 use Net7\KorboApiBundle\Entity\Item;
+use Net7\KorboApiBundle\Libs\ItemExternalImport;
 use Symfony\Component\HttpFoundation\Request,
     Symfony\Component\HttpFoundation\Response,
     Symfony\Component\HttpFoundation\AcceptHeader,
@@ -43,7 +44,8 @@ use Symfony\Component\Security\Acl\Exception\Exception;
  * )
  *
  */
-class ItemsController extends KorboI18NController {
+class ItemsController extends KorboI18NController
+{
 
     /**
      * The method is called when OPTIONS Header is set.
@@ -77,12 +79,9 @@ class ItemsController extends KorboI18NController {
      * @param Request $request - web request
      *
      * @return Response
-     *
-     *
      */
     public function cgetAction(Request $request)
     {
-        die("asdf");
        return $this->response;
     } // "get_items"     [GET] /items
 
@@ -98,11 +97,16 @@ class ItemsController extends KorboI18NController {
     } // "new_items"     [GET] /items/new
 
 
-
+    /**
+     * @param integer $id
+     * @param Request $request
+     *
+     * @return mixed
+     */
     public function getAction($id, Request $request)
-    {die("asdf111");
+    {
         return $this->response;
-    } // "get_item"      [GET] /items/{slug}
+    } // "get_item"      [GET] /baskets/{basket-id}/items/{slug}
 
 
 
@@ -145,6 +149,14 @@ class ItemsController extends KorboI18NController {
      *              @SWG\Parameter(
      *                  name="label",
      *                  description="Label of the item,",
+     *                  paramType="query",
+     *                  required=false,
+     *                  format="string",
+     *                  type="string"
+     *              ),
+     *              @SWG\Parameter(
+     *                  name="resourceUrl",
+     *                  description="Resource you want to import",
      *                  paramType="query",
      *                  required=false,
      *                  format="string",
@@ -194,26 +206,49 @@ class ItemsController extends KorboI18NController {
     public function postAction(Request $request)
     {
         // empty request 400 - basket not specified and not edit mode
-        if ($request->get("basketId", false) === false && $request->get("id", false) === false) {
+        if ($request->get("basketId", false) === false &&
+            $request->get("id", false) === false
+        ) {
             $this->response->setStatusCode(400);
 
             return $this->response;
         }
 
+        $resourceToImport            = $request->get("resourceUrl", false);
+        $importResourceSynchronously = $request->get("sync", true);
+
         $em = $this->getDoctrine()->getManager();
 
         $basket = $em->find("Net7KorboApiBundle:Basket", $request->get('basketId'));
 
-        // if the id parameter is present we modify an existing item...otherwise we will create a new one
+        // if the id parameter is present we modify an existing item...otherwise we will create a new one @var Item
         $item = ( ($id = $request->get("id", false) ) === false) ? new Item() : $em->find("Net7KorboApiBundle:Item", $id);
 
         $item->setBasket($basket);
-        $this->checkAndSetTranslation($item, 'label', $request);
-        $this->checkAndSetTranslation($item, 'abstract', $request);
 
-        // at the beginning the depiction is an url
-        $this->checkAndSetField('depiction', $request, $item);
-        $this->checkAndSetField('type', $request, $item, array());
+        //no resource to import passed as parameter
+        if ($resourceToImport === false) {
+            $this->checkAndSetTranslation($item, 'label', $request);
+            $this->checkAndSetTranslation($item, 'abstract', $request);
+
+            // at the beginning the depiction is an url
+            $this->checkAndSetField('depiction', $request, $item);
+            $this->checkAndSetField('type', $request, $item, array());
+        } else {
+            // new resource to import
+            $itemImporter = new ItemExternalImport($resourceToImport, $item, $importResourceSynchronously, $this->container);
+
+            try{
+                $itemImporter->importResource();
+            } catch (\Exception $e) {
+                // TODO improve error message
+                $this->response->setStatusCode(400);
+                $this->response->setContent(json_encode(array("error" => $e->getMessage())));
+
+                return $this->response;
+            }
+            $item->setResource($resourceToImport);
+        }
 
         $em->persist($item);
         $em->flush();
@@ -232,6 +267,7 @@ class ItemsController extends KorboI18NController {
             // modified item
             $this->response->setStatusCode(204);
         }
+
         return $this->response;
     } // "post_items"    [POST] /items
 

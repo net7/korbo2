@@ -11,6 +11,9 @@ use FOS\RestBundle\Controller\FOSRestController;
 
 use Net7\KorboApiBundle\Entity\Basket;
 
+use Net7\KorboApiBundle\Entity\Item;
+use Net7\KorboApiBundle\Libs\FreebaseSearchDriver;
+use Net7\KorboApiBundle\Libs\ItemExternalImport;
 use Symfony\Component\HttpFoundation\Request,
     Symfony\Component\HttpFoundation\Response,
     Symfony\Component\HttpFoundation\AcceptHeader,
@@ -42,7 +45,8 @@ use Symfony\Component\Security\Acl\Exception\Exception;
  * )
  *
  */
-class BasketsController extends KorboController{
+class BasketsController extends KorboController
+{
 
     /**
      * The method is called when OPTIONS Header is set.
@@ -128,7 +132,14 @@ class BasketsController extends KorboController{
     } // "new_baskets"     [GET] /baskets/new
 
 
-
+    /**
+     * Returns the representation of the basket
+     *
+     * @param integer $id
+     * @param Request $request
+     *
+     * @return Response
+     */
     public function getAction($id, Request $request)
     {
         return $this->response;

@@ -19,8 +19,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Swagger\Annotations as SWG;
 use Symfony\Component\Security\Acl\Exception\Exception;
 
-
-class KorboController extends Controller {
+/**
+ * Class KorboController
+ *
+ * @package Net7\KorboApiBundle\Controller
+ */
+class KorboController extends Controller
+{
 
     /**
      * @var Response
@@ -52,9 +57,10 @@ class KorboController extends Controller {
     /**
      * Gets and sort language headers
      *
-     * @param $acceptedLanguage
+     * @param string $acceptedLanguage
      *
      * @return mixed|string
+     *
      */
     private function sortAndGetHeaderLanguage($acceptedLanguage)
     {

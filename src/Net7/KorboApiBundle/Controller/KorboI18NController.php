@@ -26,7 +26,8 @@ use Symfony\Component\Security\Acl\Exception\Exception;
  *
  * @package Net7\KorboApiBundle\Controller
  */
-class KorboI18NController extends KorboController {
+class KorboI18NController extends KorboController
+{
 
     private function removeTranslation( $translationClass, $objId, $translationLocale, $translationField)
     {
