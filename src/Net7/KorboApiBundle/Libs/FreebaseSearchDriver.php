@@ -23,14 +23,16 @@ class FreebaseSearchDriver extends AbstractSearchDriver {
 
     private $languagesToRetrieve;
 
-    public function __construct($freebaseBaseUrl, $freebaseApiKey, $freebaseTopicBaseUrl, $freebaseMqlBaseUrl, $languagesToRetrieve, $extraParameters = array())
+    private $freebaseImageUrl;
+
+    public function __construct($freebaseBaseUrl, $freebaseApiKey, $freebaseTopicBaseUrl, $freebaseMqlBaseUrl, $freebaseImageUrl, $languagesToRetrieve, $extraParameters = array())
     {
         $this->freebaseApiKey       = $freebaseApiKey;
         $this->freebaseBaseUrl      = $freebaseBaseUrl;
-        //$this->defaultLanguage      = ($defaultLanguage === false) ? 'en' : $defaultLanguage;
         $this->freebaseTopicBaseUrl = $freebaseTopicBaseUrl;
         $this->freebaseMqlBaseUrl   = $freebaseMqlBaseUrl;
-        $this->languagesToRetrieve = $languagesToRetrieve;
+        $this->languagesToRetrieve  = $languagesToRetrieve;
+        $this->freebaseImageUrl     = $freebaseImageUrl;
 
         if (empty($extraParameters)){
             $extraParameters = array(
@@ -79,6 +81,11 @@ class FreebaseSearchDriver extends AbstractSearchDriver {
      */
     public function getEntityMetadata($freebaseEntityUrl)
     {
+        // checks if the url is valid
+        if (strpos($freebaseEntityUrl, '//www.freebase.com') === false){
+            throw new \Exception("Invalid Freebase Resource URL");
+        }
+
         $itemResponseContainer = new ItemResponseContainer();
 
         // TODO better replace
@@ -111,7 +118,7 @@ class FreebaseSearchDriver extends AbstractSearchDriver {
 
         if (empty($jsonEntity['result'])) {
             // invalid freebaseUrl
-           throw new \Exception("Invalid Url");
+           throw new \Exception("Invalid Freebase Resource ID");
         }
 
         // iterating over languages and types
@@ -131,6 +138,8 @@ class FreebaseSearchDriver extends AbstractSearchDriver {
             $jsonDescription = json_decode(file_get_contents($this->freebaseTopicBaseUrl . $freebaseEntityId . "?lang={$languageToRetrieve}&key={$this->freebaseApiKey}&filter=" . urlencode($params['filter'])), true);
             $itemResponseContainer->setDescription($jsonDescription['property']['/common/topic/description']['values'][0]['value'], $languageToRetrieve);
         }
+
+        $itemResponseContainer->setDepiction($this->freebaseImageUrl . $freebaseEntityId);
 
         // format the result in a standard format that has to be passed to ItemPersister
         return $itemResponseContainer;

@@ -56,13 +56,14 @@ class ItemExternalImport {
 
     private function getSearchDriverForResource()
     {
-        if (strpos($this->resourceToImport, 'www.freebase.com') !== -1)
+        if (strpos($this->resourceToImport, 'www.freebase.com') !== false)
         {
             return new FreebaseSearchDriver(
-                $this->container->getParameter("freebase_search_base_url"),
+                                       $this->container->getParameter("freebase_search_base_url"),
                                        $this->container->getParameter("freebase_api_key"),
                                        $this->container->getParameter("freebase_topic_base_url"),
                                        $this->container->getParameter("freebase_base_mql_url"),
+                                       $this->container->getParameter("freebase_image_search"),
                                        $this->container->getParameter("freebase_languages_to_retrieve")
                 );
         } else {
