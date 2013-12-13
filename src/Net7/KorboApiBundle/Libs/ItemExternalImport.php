@@ -35,28 +35,31 @@ class ItemExternalImport {
      */
     public function importResource()
     {
-        if ($this->isResourceValid()){
-            $this->item->setResource($this->resourceToImport);
+        $this->item->setResource($this->resourceToImport);
 
-            if ($this->isSync){
-                try {
-                    $importPersister = new ItemImportPersister($this->getSearchDriverForResource()->getEntityMetadata($this->resourceToImport),
-                                            $this->item
-                                           );
+        if ($this->isSync){
+            try {
+                $importPersister = new ItemImportPersister($this->getSearchDriverForResource()->getEntityMetadata($this->resourceToImport),
+                                        $this->item
+                                       );
 
-                    $importPersister->fillItemFields();
-                } catch (\Exception $e){
-                    throw $e;
-                }
-           }
-        } else {
-            throw new \Exception("Resource not valid");
-        }
+                $importPersister->fillItemFields();
+            } catch (\Exception $e){
+                throw $e;
+            }
+       }
     }
 
+    /**
+     * Returns the driver for the resource to import
+     *
+     * @return FreebaseSearchDriver
+     *
+     * @throws \Exception
+     */
     private function getSearchDriverForResource()
     {
-        if (strpos($this->resourceToImport, 'www.freebase.com') !== false)
+        if ($this->isResourceValid())
         {
             return new FreebaseSearchDriver(
                                        $this->container->getParameter("freebase_search_base_url"),
@@ -78,7 +81,7 @@ class ItemExternalImport {
      */
     private function isResourceValid()
     {
-        if (strpos($this->resourceToImport, 'www.freebase.com') === -1)
+        if (strpos($this->resourceToImport, 'www.freebase.com') === false)
             return false;
 
         return true;

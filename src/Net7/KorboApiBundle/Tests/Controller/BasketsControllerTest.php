@@ -16,6 +16,7 @@ class BasketsControllerTest extends WebTestCase
 
     protected function setUp()
     {
+        exec('php app/console doctrine:query:sql --env="test" "delete from item;ALTER TABLE item AUTO_INCREMENT = 1"');
         exec('php app/console doctrine:query:sql --env="test" "delete from basket;ALTER TABLE basket AUTO_INCREMENT = 1"');
 
         static::$kernel = static::createKernel();

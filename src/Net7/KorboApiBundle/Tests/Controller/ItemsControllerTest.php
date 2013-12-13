@@ -44,6 +44,49 @@ class ItemsControllerTest extends WebTestCase
         $this->em->close();
     }
 
+    public function testImportFromFreebase()
+    {
+        $client = static::createClient();
+
+        $crawler = $client->request('POST',
+            $this->itemsUrl,
+            array('resourceUrl' => 'https://www.freebase.com/m/02mjmr')
+        );
+
+        // everything fine
+        $this->assertTrue($client->getResponse()->isRedirect());
+
+        $itemId = substr( $client->getResponse()->headers->get('Location'), strrpos($client->getResponse()->headers->get('Location'), '/') + 1);
+        $item = $this->em->getRepository("Net7KorboApiBundle:Item")->find($itemId);
+
+        $this->assertEquals("https://www.freebase.com/m/02mjmr", $item->getResource());
+
+    }
+
+    public function testImportFromFreebaseWrongUrl()
+    {
+        $client = static::createClient();
+
+        $crawler = $client->request('POST',
+             $this->itemsUrl,
+            array('resourceUrl' => 'https://www.freebase.com/m/02mjmr1111')
+        );
+
+        $this->assertEquals($client->getResponse()->getStatusCode(), 400);
+    }
+
+    public function testPostNoBasketIdNoId()
+    {
+        $client = static::createClient();
+
+        $crawler = $client->request('POST',
+            "/v1/baskets/aaa/items"
+        );
+
+        $this->assertEquals($client->getResponse()->getStatusCode(), 400);
+
+    }
+
     public function testSavedItem()
     {
         $client = static::createClient();
@@ -53,6 +96,7 @@ class ItemsControllerTest extends WebTestCase
         );
 
         $itemId = substr( $client->getResponse()->headers->get('Location'), strrpos($client->getResponse()->headers->get('Location'), '/') + 1);
+
         $item = $this->em->getRepository("Net7KorboApiBundle:Item")->find($itemId);
 
         $this->assertEquals($this->basketId, $item->getBasket()->getId());
@@ -77,34 +121,23 @@ class ItemsControllerTest extends WebTestCase
         $this->assertTrue($client->getResponse()->isRedirect());
     }
 
-    public function testItemsContent()
-    {
-        $client = static::createClient();
-
-        $crawler = $client->request('POST',
-            $this->itemsUrl,
-            array("content" => self::$_TEST_CONTENT)
-        );
-        $postedLetterLocation = $client->getResponse()->headers->get('Location');
-
-    }
 
     /**
      * Tests empty POST
 
     public function testPostBadValue()
     {
-        $client = static::createClient();
+    $client = static::createClient();
 
-        $crawler = $client->request('POST', $this->itemsUrl);
+    $crawler = $client->request('POST', $this->itemsUrl);
 
-        $this->assertEquals(
-            400,
-            $client->getResponse()->getStatusCode()
-        );
+    $this->assertEquals(
+    400,
+    $client->getResponse()->getStatusCode()
+    );
 
     }
-*/
+     */
     /**
      * requesting a bad page
      */

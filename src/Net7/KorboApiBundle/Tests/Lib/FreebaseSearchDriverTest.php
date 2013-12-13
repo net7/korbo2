@@ -7,7 +7,7 @@ use Net7\KorboApiBundle\Libs\FreebaseSearchDriver;
 use Net7\KorboApiBundle\Libs\ItemResponseContainer;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class ItemsControllerTest extends WebTestCase
+class FreebaseSearchDriverTest extends WebTestCase
 {
 
     private static $_URL_TO_IMPORT_FULL = 'https://www.freebase.com/m/02mjmr';
@@ -16,10 +16,6 @@ class ItemsControllerTest extends WebTestCase
      * @var \Doctrine\ORM\EntityManager
      */
     private $em;
-
-    private $itemsUrl;
-
-    private $basketId;
 
     private $container;
 
@@ -53,9 +49,12 @@ class ItemsControllerTest extends WebTestCase
             $this->container->getParameter("freebase_languages_to_retrieve")
         );
 
-        $searchDriver->getEntityMetadata('https://www.freebase.com/m/0sxbv4d111');
+        $searchDriver->getEntityMetadata(self::$_URL_TO_IMPORT_FULL . '11111');
     }
 
+    /**
+     * Passing a not valid resource
+     */
     public function testFreebaseInvalidResourceUrl()
     {
         $this->setExpectedException('Exception', 'Invalid Freebase Resource URL');
@@ -72,7 +71,9 @@ class ItemsControllerTest extends WebTestCase
         $searchDriver->getEntityMetadata('/m/0sxbv4d111');
     }
 
-
+    /**
+     * Expected results from freebase
+     */
     public function testFreebaseCountResults()
     {
         $searchDriver = new FreebaseSearchDriver(
@@ -85,16 +86,17 @@ class ItemsControllerTest extends WebTestCase
         );
 
         /* @var ItemResponseContainer OBAMA */
-        $itemResponseContainer = $searchDriver->getEntityMetadata('https://www.freebase.com/m/02mjmr');
+        $itemResponseContainer = $searchDriver->getEntityMetadata(self::$_URL_TO_IMPORT_FULL);
 
         $this->assertEquals(4, count($itemResponseContainer->getLabels()));
         $this->assertEquals(4, count($itemResponseContainer->getDescriptions()));
         $this->assertEquals($this->container->getParameter("freebase_image_search") . "/m/02mjmr", $itemResponseContainer->getDepiction());
 
-
-
+        // at least one type
+        $this->assertGreaterThan(1, count($itemResponseContainer->getTypes()));
     }
-    // TODO Testare la presenza di tutte le sezioni nella risposta di freebase, morte quelle non va più il driver
+
+
 
 
 

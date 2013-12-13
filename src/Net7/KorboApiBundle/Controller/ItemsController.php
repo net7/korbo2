@@ -205,8 +205,7 @@ class ItemsController extends KorboI18NController
      */
     public function postAction(Request $request)
     {
-        // empty request 400 - basket not specified and not edit mode
-        if ($request->get("basketId", false) === false &&
+        if ( ($request->get("basketId", false) === false || !is_numeric($request->get("basketId", false))) &&
             $request->get("id", false) === false
         ) {
             $this->response->setStatusCode(400);
@@ -221,11 +220,10 @@ class ItemsController extends KorboI18NController
 
         $basket = $em->find("Net7KorboApiBundle:Basket", $request->get('basketId'));
 
-        // if the id parameter is present we modify an existing item...otherwise we will create a new one @var Item
+        /** if the id parameter is present we modify an existing item...otherwise we will create a new one @var Item */
         $item = ( ($id = $request->get("id", false) ) === false) ? new Item() : $em->find("Net7KorboApiBundle:Item", $id);
 
         $item->setBasket($basket);
-
         //no resource to import passed as parameter
         if ($resourceToImport === false) {
             $this->checkAndSetTranslation($item, 'label', $request);

@@ -136,6 +136,7 @@ class Item
         $this->type           = json_encode(array());
         $this->depiction      = "";
         $this->languageCode   = "";
+        $this->resource       = "";
     }
 
     /**
