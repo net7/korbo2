@@ -97,16 +97,90 @@ class ItemsController extends KorboI18NController
     } // "new_items"     [GET] /items/new
 
 
-    /**
-     * @param integer $id
-     * @param Request $request
+
+     /**
+     * @param int     $id      - Item Id
+     * @param Request $request - web request
      *
-     * @return mixed
+     * @return Response
+     * @throws NotFoundHttpException
+     *
+     *  @SWG\Api(
+     *   path="/baskets/{basketId}/items/{id}",
+     *   @SWG\Operations(
+     *      @SWG\Operation(
+     *          produces="['application/json', 'text/html']",
+     *          method="GET",
+     *          type="Item",
+     *          summary="Find an item by ID",
+     *          notes="Gets the JSON representation of the item. Only application/json Accept value is supported.
+     *                 The header 'Accept-Language' specifies the preferred language to retrieve the item.
+     *                 Any ISO 639-1 value is supported.",
+     *          nickname="getItemById",
+     *          @SWG\Parameters(
+     *              @SWG\Parameter(
+     *                  name="id",
+     *                  description="ID of the item that needs to be fetched",
+     *                  paramType="path",
+     *                  required="true",
+     *                  format="int64",
+     *                  type="integer"
+     *              ),
+     *              @SWG\Parameter(
+     *                  name="Accept-Language",
+     *                  description="Language representation of the $item, ISO 639-1 codes (en, it, de, ..)",
+     *                  paramType="header",
+     *                  required="false",
+     *                  type="string",
+     *                  enum="['en', 'it', 'de']"
+     *              )
+     *          ),
+     *          @SWG\ResponseMessage(code=405, message="Method not allowed"),
+     *          @SWG\ResponseMessage(code=404, message="Item not found"),
+     *          @SWG\ResponseMessage(code=204, message="There is no representation for the requested item - only JSON is supported...at the moment")
+     *     )
+     *   )
+     *  )
      */
     public function getAction($id, Request $request)
     {
+        $em = $this->getDoctrine()->getManager();
+
+        $item = $this->getDoctrine()
+            ->getRepository('Net7KorboApiBundle:Item')
+            ->find($id);
+
+        // 404 not found
+        if (!$item instanceof Item) {
+            throw new NotFoundHttpException('Item not found');
+        }
+
+        // if the language requested is not available the default language will be returned
+        if (!$item->hasLanguageAvailable($this->acceptLanguage)) {
+            $this->acceptLanguage = $this->container->getParameter('openpal_default_locale');
+        }
+
+        // TODO: vedi https://github.com/FriendsOfSymfony/FOSRestBundle/blob/master/Resources/doc/3-listener-support.md
+        // per configurazione content neg
+
+        // loading the  in the corrent locale
+        $item->setTranslatableLocale($this->acceptLanguage);
+        $em->refresh($item);
+
+        $item->setLanguageCode($this->acceptLanguage);
+
+        if ($this->accept->has('application/json')) {
+            $serializer  = $this->container->get('serializer');
+            $jsonContent = $serializer->serialize($item, 'json');
+
+            $this->response->setContent($jsonContent);
+            $this->response->headers->set('Content-Type', 'application/json');
+        } else {
+            // no content: there is no representation for the requested resource
+            $this->response->setStatusCode(204);
+        }
         return $this->response;
-    } // "get_item"      [GET] /baskets/{basket-id}/items/{slug}
+    } // "get_item"      [GET] /baskets/{basket-id}/items/{id}
 
 
 
