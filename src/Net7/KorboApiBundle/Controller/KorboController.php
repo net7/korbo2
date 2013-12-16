@@ -51,6 +51,8 @@ class KorboController extends Controller
 
         $this->response = new Response();
         $this->response->headers->set('Access-Control-Allow-Origin', "*");
+
+        $this->logger = $this->get('logger');
     }
 
 

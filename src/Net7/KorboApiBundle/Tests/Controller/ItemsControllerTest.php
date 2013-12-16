@@ -44,6 +44,46 @@ class ItemsControllerTest extends WebTestCase
         $this->em->close();
     }
 
+
+    public function testGetItemDetails()
+    {
+
+    }
+
+    /**
+     * Checks if the json response of /v1/items returns an object containing the item fields
+     *
+     */
+    public function testItemFieldPresenceContent()
+    {
+        $client = static::createClient();
+
+        $this->loadItems(1);
+
+        $crawlerJson = $client->request('GET',
+            $this->itemsUrl . '/1',
+            array(),
+            array(),
+            array(
+                'HTTP_ACCEPT'  => 'application/json'
+            )
+        );
+
+        $item = json_decode($client->getResponse()->getContent(), true);
+
+        //print_r($item);die;
+
+        $this->assertTrue(array_key_exists('id', $item));
+        $this->assertTrue(array_key_exists('basket_id', $item));
+        $this->assertTrue(array_key_exists('label', $item));
+        $this->assertTrue(array_key_exists('abstract', $item));
+        $this->assertTrue(array_key_exists('type', $item));
+        $this->assertTrue(array_key_exists('depiction', $item));
+        $this->assertTrue(array_key_exists('language_code', $item));
+        $this->assertTrue(array_key_exists('available_languages', $item));
+
+    }
+
     public function testImportFromFreebase()
     {
         $client = static::createClient();
@@ -121,23 +161,94 @@ class ItemsControllerTest extends WebTestCase
         $this->assertTrue($client->getResponse()->isRedirect());
     }
 
-
     /**
-     * Tests empty POST
-
-    public function testPostBadValue()
-    {
-    $client = static::createClient();
-
-    $crawler = $client->request('POST', $this->itemsUrl);
-
-    $this->assertEquals(
-    400,
-    $client->getResponse()->getStatusCode()
-    );
-
-    }
+     * requesting a non supported accept.
+     *
      */
+    public function testAcceptNotAllowedGetRequest()
+    {
+        $client = static::createClient();
+
+        $this->loadItems(1);
+
+        $crawler = $client->request('GET',
+            '/v1/baskets/1/items/1',
+            array(),
+            array(),
+            array(
+                'HTTP_ACCEPT'  => 'application/msword'
+           )
+        );
+
+        $this->assertEquals(
+            204,
+            $client->getResponse()->getStatusCode()
+        );
+    }
+
+
+
+
+    public function testGetStatusCodeAndHeaderHtml()
+    {
+        $this->loadItems(1);
+
+        $client = static::createClient();
+        $crawler = $client->request('GET',
+            '/v1/baskets/1/items/1',
+            array(),
+            array(),
+            array(
+                'HTTP_ACCEPT'  => 'application/json'
+            )
+        );
+
+
+        $this->assertEquals(
+            200,
+            $client->getResponse()->getStatusCode()
+        );
+
+        $this->assertTrue(
+            $client->getResponse()->headers->contains(
+                'Content-Type',
+                'application/json'
+            )
+        );
+    }
+
+    public function testGetStatusCodeAndHeaderJson()
+    {
+        $this->loadItems(1);
+
+        $client = static::createClient();
+
+
+        $crawler = $client->request('GET',
+                                    '/v1/baskets/1/items/1',
+                                    array(),
+                                    array(),
+                                    array(
+                                        'HTTP_ACCEPT'  => 'application/json'
+                                    ));
+
+
+        $this->assertEquals(
+            200,
+            $client->getResponse()->getStatusCode()
+        );
+
+        $this->assertTrue(
+            $client->getResponse()->headers->contains(
+                'Content-Type',
+                'application/json'
+            )
+        );
+    }
+
+
+
+
     /**
      * requesting a bad page
      */
@@ -192,8 +303,7 @@ class ItemsControllerTest extends WebTestCase
 
         for ($i = 0; $i < $numItems; $i++ ) {
             $crawler = $client->request('POST',
-                $this->itemsUrl,
-                array("content" => self::$_TEST_CONTENT)
+                $this->itemsUrl
             );
         }
     }

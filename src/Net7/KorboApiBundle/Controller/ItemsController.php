@@ -157,7 +157,7 @@ class ItemsController extends KorboI18NController
 
         // if the language requested is not available the default language will be returned
         if (!$item->hasLanguageAvailable($this->acceptLanguage)) {
-            $this->acceptLanguage = $this->container->getParameter('openpal_default_locale');
+            $this->acceptLanguage = $this->container->getParameter('korbo_default_locale');
         }
 
         // TODO: vedi https://github.com/FriendsOfSymfony/FOSRestBundle/blob/master/Resources/doc/3-listener-support.md
