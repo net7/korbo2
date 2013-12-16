@@ -12,7 +12,9 @@ use FOS\RestBundle\Controller\FOSRestController;
 use Net7\KorboApiBundle\Entity\Basket;
 
 use Net7\KorboApiBundle\Entity\Item;
+use Net7\KorboApiBundle\Entity\ItemRepository;
 use Net7\KorboApiBundle\Libs\ItemExternalImport;
+use Net7\KorboApiBundle\Utility\ItemsPaginator;
 use Symfony\Component\HttpFoundation\Request,
     Symfony\Component\HttpFoundation\Response,
     Symfony\Component\HttpFoundation\AcceptHeader,
@@ -73,19 +75,102 @@ class ItemsController extends KorboI18NController
     {
     } // "options_items" [OPTIONS] /items/{id}
 
+
     /**
-     * Lists all the baskets
+     * Lists all the items
      *
      * @param Request $request - web request
      *
      * @return Response
+     *
+     *
+     *  @SWG\Api(
+     *   path="/baskets/{basketId}/items",
+     *   @SWG\Operations(
+     *      @SWG\Operation(
+     *          produces="['application/json', 'text/html']",
+     *          method="GET",
+     *          type="array",
+     *          @SWG\Items("Item"),
+     *          summary="Retrieves the items index",
+     *          notes="Retrieves the list of all the items present in the store. All the item attributes are contained into the response",
+     *          nickname="retrieveItems",
+     *          @SWG\ResponseMessage(code=204, message="There is no representation for the requested item - only JSON is supported"),
+     *           @SWG\Parameters(
+     *              @SWG\Parameter(
+     *                  name="basketId",
+     *                  description="Basket id",
+     *                  paramType="path",
+     *                  required=true,
+     *                  format="integer",
+     *                  type="string"
+     *              ),
+     *              @SWG\Parameter(
+     *                  name="limit",
+     *                  description="Number of results per page",
+     *                  paramType="query",
+     *                  required="false",
+     *                  format="string",
+     *                  type="string"
+     *              ),
+     *             @SWG\Parameter(
+     *                  name="offset",
+     *                  description="Result offset",
+     *                  paramType="query",
+     *                  required="false",
+     *                  format="string",
+     *                  type="string"
+     *              )
+     *          )
+     *     )
+     *   )
+     *  )
+     *
      */
     public function cgetAction(Request $request)
     {
-       return $this->response;
-    } // "get_items"     [GET] /items
+        // TODO: only json accepted at the moment
+        // no content: there is no representation for the requested resource
+        if (!$this->accept->has('application/json')) {
+            $this->response->setStatusCode(204);
 
+            return $this->response;
+        }
 
+        $offset = $request->get('offset', 0);
+        // if no limit is passed set default page size
+        $limit  = $request->get('limit', $this->container->getParameter('korbo_api_default_page_size'));
+        $baseApiPath = 'http://' . $request->getHttpHost() . $request->getPathInfo();
+
+        $em = $this->getDoctrine()->getManager();
+
+        $items = $em->createQuery(
+            'SELECT i
+             FROM Net7KorboApiBundle:Item i')
+            ->setMaxResults($limit)
+            ->setFirstResult($offset)
+            ->getResult();
+
+        $serializer  = $this->container->get('serializer');
+
+        $jsonItemArray = array();
+        foreach ($items as $item){
+            $item->setTranslatableLocale($this->acceptLanguage);
+            $em->refresh($item);
+
+            $jsonItemArray[] =  $serializer->serialize($item, 'json');
+        }
+
+        $paginator = new ItemsPaginator($em->createQuery(ItemRepository::getItemsCountQueryString()), $baseApiPath, $limit, $offset);
+        $metadata = $paginator->getPaginationMetadata();
+
+        $jsonContent = '{"data":[' . implode(',', $jsonItemArray) . '], "metadata":' . json_encode($metadata, JSON_UNESCAPED_SLASHES) . '}';
+
+        $this->response->setContent($jsonContent);
+        $this->response->headers->set('Content-Type', 'application/json');
+
+        return $this->response;
+    } // "get_letters"     [GET] /baskets/{basket-id}/items
 
     /**
      * Empty action

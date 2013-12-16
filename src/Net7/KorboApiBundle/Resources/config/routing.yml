@@ -47,6 +47,13 @@ net7_korbo_api_item_new:
   requirements:
     _method: POST
 
+net7_korbo_api_item_list:
+  pattern:  /v1/baskets/{basketId}/items
+  defaults: { _controller: Net7KorboApiBundle:Items:cget}
+  requirements:
+    _method: GET
+
+
 net7_korbo_api_item_get:
   pattern:  /v1/baskets/{basketId}/items/{id}
   defaults: { _controller: Net7KorboApiBundle:Items:get}

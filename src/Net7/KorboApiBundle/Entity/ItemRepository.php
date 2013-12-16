@@ -41,4 +41,52 @@ class ItemRepository extends EntityRepository{
 
 
 
+   /**
+     * Counts the number of items by locale and query string
+     *
+     * @param $locale
+     * @param $queryString
+    *
+     * @return mixed
+     */
+    public function countItemsByLocaleAndQueryString($locale, $queryString)
+    {
+        return $this->getItemsByLocaleAndQueryStringQuery($queryString, $locale)->getSingleScalarResult();
+    }
+
+    /**
+     * Retrieves the items by locale and query string
+     *
+     * @param $locale
+     * @param $queryString
+     * @param bool $limit
+     * @param bool $offset
+     *
+     * @return array
+     */
+    public function findByLocaleAndQueryString($locale, $queryString, $limit = false, $offset = false)
+    {
+        $query = $this->getItemsByLocaleAndQueryStringQuery($queryString, $locale);
+
+        if ($limit !== false) {
+            $query->setMaxResults($limit);
+        }
+
+        if ($offset !== false) {
+            $query->setFirstResult($offset);
+        }
+
+        return $query->getResult();
+
+    }
+
+
+    public static function getItemsCountQueryString()
+    {
+        return  'SELECT count(l)
+                 FROM Net7KorboApiBundle:Item l';
+    }
+
+
+
 }
