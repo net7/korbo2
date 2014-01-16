@@ -26,7 +26,7 @@
         "phpunit/phpunit": "3.7.*",
         "floriansemm/solr-bundle": "dev-master",
         "solarium/solarium": "dev-master",
-        "squizlabs/php_codesniffer": "dev-phpcs-fixer",
+        "squizlabs/php_codesniffer": "dev-master",
         "gedmo/doctrine-extensions": "2.3.*@dev",
         "doctrine/doctrine-fixtures-bundle": "dev-master",
         "phing/phing": "dev-master"
