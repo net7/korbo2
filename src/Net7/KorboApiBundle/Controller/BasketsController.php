@@ -168,7 +168,6 @@ class BasketsController extends KorboController
      *                  name="id",
      *                  description="Id of the basket",
      *                  paramType="query",
-     *                  required=true,
      *                  format="integer",
      *                  type="string"
      *              ),
@@ -176,7 +175,6 @@ class BasketsController extends KorboController
      *                  name="label",
      *                  description="Label of the basket,",
      *                  paramType="query",
-     *                  required=true,
      *                  format="string",
      *                  type="string"
      *              )

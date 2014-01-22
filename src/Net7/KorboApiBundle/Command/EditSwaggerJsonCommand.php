@@ -51,16 +51,21 @@ class EditSwaggerJsonCommand extends ContainerAwareCommand
 //        $output->write('type: '.$type, true);
 
         $swaggerRoot = $this->getContainer()->get('kernel')->getRootDir() . '/../swagger/';
+        $basePath = $this->getContainer()->getParameter('swagger_base_path');
+        $apiPrefix = $this->getContainer()->getParameter('korbo_api_prefix');
 
         $swaggerItemsConfigFile = $swaggerRoot . 'items.json';
         $swaggerJson = json_decode(file_get_contents($swaggerItemsConfigFile), true);
-
-        $basePath = $this->getContainer()->getParameter('swagger_base_path');
-        $apiPrefix = $this->getContainer()->getParameter('korbo_api_prefix');
         $swaggerJson['basePath'] = $basePath . '/' . $apiPrefix;
-
         file_put_contents($swaggerItemsConfigFile, json_encode($swaggerJson, JSON_PRETTY_PRINT));
-        $output->write("Korbo2: Base Path changed correctly to {$basePath}", true);
+        $output->write("Korbo2: {$swaggerItemsConfigFile} basePath changed correctly to {$swaggerJson['basePath']}", true);
+
+        $swaggerBasketsConfigFile = $swaggerRoot . 'baskets.json';
+        $swaggerJson = json_decode(file_get_contents($swaggerBasketsConfigFile), true);
+        $swaggerJson['basePath'] = $basePath . '/' . $apiPrefix;
+        file_put_contents($swaggerBasketsConfigFile, json_encode($swaggerJson, JSON_PRETTY_PRINT));
+        $output->write("Korbo2: {$swaggerBasketsConfigFile} basePath changed correctly to {$swaggerJson['basePath']}", true);
+
         // Generates a config file for the UI, to have it ready and configured
         // for this instance korbo2
         $swaggerUIConfigFile = $swaggerRoot . 'swagger-korbo-conf.js';
