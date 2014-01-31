@@ -73,6 +73,10 @@ class ItemsController extends KorboI18NController
      */
     public function optionsAction()
     {
+        $this->response->setContent('{}');
+        $this->response->headers->set('Content-Type', 'application/json');
+
+        return $this->response;
     } // "options_items" [OPTIONS] /items/{id}
 
 

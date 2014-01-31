@@ -39,9 +39,9 @@ class KorboController extends Controller
      */
     public function initialize(Request $request)
     {
-        $this->accept         = AcceptHeader::fromString($request->headers->get('Accept'));
+        $this->accept          = AcceptHeader::fromString($request->headers->get('Accept'));
 
-        $this->acceptLanguage = ($request->headers->has('Accept-Language')) ?
+        $this->acceptLanguage  = ($request->headers->has('Accept-Language')) ?
             $this->sortAndGetHeaderLanguage((string) AcceptHeader::fromString($request->headers->get('Accept-Language'))) :
             $this->container->getParameter('korbo_default_locale');
 
@@ -50,6 +50,7 @@ class KorboController extends Controller
             $this->container->getParameter('korbo_default_locale');
 
         $this->response = new Response();
+
         $this->response->headers->set('Access-Control-Allow-Origin', "*");
 
         $this->logger = $this->get('logger');
