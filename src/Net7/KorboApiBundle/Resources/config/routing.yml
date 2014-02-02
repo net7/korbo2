@@ -67,6 +67,14 @@ net7_korbo_api_item_get:
   requirements:
     _method: GET
 
+
+net7_korbo_api_item_search:
+  pattern:  /v1/search/items
+  defaults: { _controller: Net7KorboApiBundle:Items:searchItems}
+  requirements:
+    _method: GET
+
+
 #
 #
 #

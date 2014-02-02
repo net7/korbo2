@@ -66,13 +66,20 @@ class Item
     /**
      * @var string
      *
-     * @ Solr\Field(type="string")
+     * @Solr\Field(type="string")
      *
      * @ Gedmo\Translatable
      *
      * @ ORM\Column(name="abstract", type="text")
      */
     private $abstract;
+
+    /**
+     * @var array
+     *
+     * @Solr\Field(type="string")
+    private $abstracts;
+     */
 
 
     /**
@@ -123,6 +130,8 @@ class Item
      *
      * @ORM\ManyToOne(targetEntity="Basket", inversedBy="items")
      * @ORM\JoinColumn(name="basket_id", referencedColumnName="id")
+     *
+     *  @Solr\Field(type="integer")
      */
     private $basket;
 
@@ -132,11 +141,20 @@ class Item
      */
     public function __construct()
     {
-        $this->translations = new ArrayCollection();
+        $this->translations   = new ArrayCollection();
         $this->type           = json_encode(array());
         $this->depiction      = "";
         $this->languageCode   = "";
         $this->resource       = "";
+    }
+
+    /**
+     * Returns all the translations of the field abstract
+     *
+     * @return string
+     */
+    public function getAbstract() {
+        return $this->getFieldTranslations('abstract');
     }
 
     /**
@@ -290,13 +308,6 @@ class Item
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getAbstract()
-    {
-        return $this->abstract;
-    }
 
     /**
      * Retrieves the translation of "abstract" field in all the available languages
@@ -433,6 +444,24 @@ class Item
         }
 
         return "";
+    }
+
+    /**
+     * Returns all the translations of the field passed as parameter
+     *
+     * @param $fieldName
+     * @return string
+     */
+    private function getFieldTranslations($fieldName)
+    {
+        $translations = array();
+        foreach ($this->translations as $translation) {
+            if ($translation->getField() == $fieldName) {
+                $translations[] = $translation->getContent();
+            }
+        }
+
+        return $translations;
     }
 
     /**

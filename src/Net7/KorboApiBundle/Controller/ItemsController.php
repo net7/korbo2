@@ -10,6 +10,7 @@ use Doctrine\ORM\AbstractQuery;
 use FOS\RestBundle\Controller\FOSRestController;
 
 use Net7\KorboApiBundle\Entity\Basket;
+use Net7\KorboApiBundle\Utility\SearchPaginator;
 
 use Net7\KorboApiBundle\Entity\Item;
 use Net7\KorboApiBundle\Entity\ItemRepository;
@@ -432,6 +433,112 @@ class ItemsController extends KorboI18NController
         return $this->response;
     } // "post_items"    [POST] /items
 
+
+    /**
+     * Search API
+     *
+     * @param Request $request
+     *
+     * @return Response
+     *
+     *  @SWG\Api(
+     *   path="/search/items",
+     *   @SWG\Operations(
+     *      @SWG\Operation(
+     *          produces="['application/json']",
+     *          method="GET",
+     *          type="array",
+     *          @SWG\Items("Item"),
+     *          summary="Search",
+     *          notes="Retrieves the list of all the Item present in the store matching the search criteria. All the item attributes are contained into the response",
+     *          nickname="retrieveItems",
+     *          @SWG\ResponseMessage(code=204, message="There is no representation for the requested search parameters - only JSON is supported"),
+     *          @SWG\Parameters(
+     *              @SWG\Parameter(
+     *                  name="q",
+     *                  description="Text pattern to search",
+     *                  paramType="query",
+     *                  required="false",
+     *                  format="string",
+     *                  type="string"
+     *              ),
+     *             @SWG\Parameter(
+     *                  name="limit",
+     *                  description="Number of results per page",
+     *                  paramType="query",
+     *                  required="false",
+     *                  format="string",
+     *                  type="string"
+     *              ),
+     *             @SWG\Parameter(
+     *                  name="offset",
+     *                  description="Result offset",
+     *                  paramType="query",
+     *                  required="false",
+     *                  format="string",
+     *                  type="string"
+     *              ),
+     *            @SWG\Parameter(
+     *                  name="lang",
+     *                  description="Language",
+     *                  paramType="query",
+     *                  required="false",
+     *                  format="string",
+     *                  type="string",
+     *                  enum="['en', 'it', 'de']"
+     *              )
+
+     *
+     *          )
+     *     )
+     *   )
+     *  )
+     *
+     */
+    public function searchItemsAction(Request $request)
+    {
+        // TODO: only json accepted at the moment
+        if (!$this->accept->has('application/json')) {
+            $this->response->setStatusCode(204);
+
+            return $this->response;
+        }
+        $em = $this->getDoctrine()->getManager();
+
+        $queryString = $request->get('q', false);
+        $locale = $request->get("lang", false) ;
+
+        $offset = $request->get('offset', 0);
+        // if no limit is passed set default page size
+        $limit  = $request->get('limit', $this->container->getParameter('korbo_api_default_page_size'));
+        $baseApiPath = 'http://' . $request->getHttpHost() . $request->getPathInfo();
+
+        $items = $em->getRepository('Net7KorboApiBundle:Item')->findByLocaleAndQueryString($locale, $queryString, $limit, $offset);
+
+        //print_r(count($items) . '<<<<');die;
+
+        $serializer  = $this->container->get('serializer');
+
+        $jsonItemsArray = array();
+        foreach ($items as $item){
+            $item->setTranslatableLocale($this->acceptLanguage);
+            $em->refresh($item);
+
+            $jsonItemsArray[] =  $serializer->serialize($item, 'json');
+        }
+
+
+        $paginator = new SearchPaginator($em, $baseApiPath, $locale, $queryString, $limit, $offset);
+
+        $metadata = $paginator->getPaginationMetadata();
+
+        $jsonContent = '{"data":[' . implode(',', $jsonItemsArray) . '], "metadata":' . json_encode($metadata, JSON_UNESCAPED_SLASHES) . '}';
+
+        $this->response->setContent($jsonContent);
+        $this->response->headers->set('Content-Type', 'application/json');
+
+        return $this->response;
+    }
 
 
     /**

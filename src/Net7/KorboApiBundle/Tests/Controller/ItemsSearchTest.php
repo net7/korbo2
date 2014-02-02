@@ -2,11 +2,19 @@
 
 namespace Net7\KorboApiBundle\Tests\Controller;
 
-use Net7\KorboApiBundle\Entity\Basket;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Net7\KorboApiBundle\Entity\Basket;
 
-class ItemsPaginationTest extends WebTestCase
+class ItemsSearchTest extends WebTestCase
 {
+
+    private static $_TEST_CONTENT = '';
+
+    private static $contents = array('This is a sample content I need to test the search (èaiiiùù)',
+                                     'Simone mi a pupperà la favona',
+                                     'Romeo a  Simone scurreggia come un drago');
+
+
 
     /**
      * setup
@@ -22,18 +30,36 @@ class ItemsPaginationTest extends WebTestCase
             ->get('doctrine')
             ->getManager()
         ;
-
         $this->basketId = $this->loadBasket('test-basket');
+
+        $this->itemsUrl = "/v1/baskets/{$this->basketId}/items";
     }
 
-    /**
-     * No items present into db
-     */
-    public function testWithNoResults()
+
+    public function testItemsResultsFail()
     {
+        $this->loadItemsI18n(7, array(
+                'en' => 'en en',
+                'it' => 'it it',
+            )
+        );
+
+        $items = $this->getItems('en', 20, 0, false);
+        $this->assertEquals(7, count($items['data']));
+
+        $items = $this->getItems('it', 20, 0, false);
+        $this->assertEquals(7, count($items['data']));
+
+    }
+
+
+    public function testSearchWithNoResults()
+    {
+        $postedItemLocation = $this->loadItems(10);
+
         $client = static::createClient();
 
-        $items = $this->getItems(2);
+        $items = $this->getItems('no-results', 2, 0);
         $links = $this->processRels($items['metadata']['links']);
 
         $this->assertEquals(0, count($items['data']));
@@ -41,32 +67,32 @@ class ItemsPaginationTest extends WebTestCase
     }
 
     /**
-     * requesting no items
+     * @group fail
      */
     public function testZeroCase()
     {
-        $this->loadItems(10);
+        $postedItemLocation = $this->loadItems(10);
 
         $client = static::createClient();
 
-        $items = $this->getItems(0, 0);
+        $items = $this->getItems('e', 2, 0);
 
-        $this->assertEquals(0, count($items['data']));
-        $this->assertEquals(0, $items['metadata']['pageCount']);
+        $this->assertEquals(2, count($items['data']));
+        $this->assertEquals(5, $items['metadata']['pageCount']);
         $this->assertEquals(10, $items['metadata']['totalCount']);
         $this->assertEquals(0, $items['metadata']['offset']);
-        $this->assertEquals(0, $items['metadata']['limit']);
-        $this->assertEquals(0, count($items['metadata']['links']));
+        $this->assertEquals(2, $items['metadata']['limit']);
+        $this->assertEquals(3, count($items['metadata']['links']));
     }
 
 
     public function testLimitCase()
     {
-        $this->loadItems(7);
+        $postedItemLocation = $this->loadItems(7);
 
         $client = static::createClient();
 
-        $items = $this->getItems(7);
+        $items = $this->getItems("this", 7);
 
         $this->assertEquals(7, count($items['data']));
         $this->assertEquals(1, $items['metadata']['pageCount']);
@@ -78,11 +104,11 @@ class ItemsPaginationTest extends WebTestCase
 
     public function testRequestingMoreItemsThanPresent()
     {
-        $this->loadItems(7);
+        $postedItemLocation = $this->loadItems(7);
 
         $client = static::createClient();
 
-        $items = $this->getItems(10);
+        $items = $this->getItems("this", 10);
 
         $this->assertEquals(7, count($items['data']));
         $this->assertEquals(1, $items['metadata']['pageCount']);
@@ -92,16 +118,16 @@ class ItemsPaginationTest extends WebTestCase
         $this->assertEquals(2, count($items['metadata']['links']));
     }
 
-
+    
 
 
     public function testIsStructureCorrect()
     {
-        $this->loadItems(10);
+        $postedItemLocation = $this->loadItems(10);
 
         $client = static::createClient();
 
-        $items = $this->getItems(5);
+        $items = $this->getItems("this", 5);
 
         $this->assertTrue(array_key_exists("data", $items));
         $this->assertTrue(array_key_exists("metadata", $items));
@@ -120,15 +146,12 @@ class ItemsPaginationTest extends WebTestCase
 
     }
 
-    /**
-     *
-     */
     public function testNoOffsetItem()
     {
 
         $this->loadItems(11);
 
-        $items = $this->getItems(5);
+        $items = $this->getItems("this", 5);
 
         // there isn't a previous link...the page requested is the first one
         $this->assertEquals(3, count($items['metadata']["links"]));
@@ -139,7 +162,7 @@ class ItemsPaginationTest extends WebTestCase
     {
         $this->loadItems(11);
 
-        $items = $this->getItems(5);
+        $items = $this->getItems("this", 5);
 
         $this->assertEquals(5, $items['metadata']['limit']);
         $this->assertEquals(0, $items['metadata']['offset']);
@@ -147,7 +170,7 @@ class ItemsPaginationTest extends WebTestCase
         $this->assertEquals(3, $items['metadata']['pageCount']);
 
 
-        $items = $this->getItems(5, 5);
+        $items = $this->getItems("this", 5, 5);
 
         $this->assertEquals(5, $items['metadata']['limit']);
         $this->assertEquals(5, $items['metadata']['offset']);
@@ -158,9 +181,9 @@ class ItemsPaginationTest extends WebTestCase
     public function testLinksEven()
     {
 
-        $this->loadItems(11);
+        $postedItemLocation = $this->loadItems(11);
 
-        $items = $this->getItems(4);
+        $items = $this->getItems("this", 4);
 
         $links = $this->processRels($items['metadata']['links']);
 
@@ -181,7 +204,7 @@ class ItemsPaginationTest extends WebTestCase
 
 
         // requesting second page
-        $items = $this->getItems(4, 4);
+        $items = $this->getItems("this",4, 4);
         $links = $this->processRels($items['metadata']['links']);
 
         // checking limit
@@ -196,7 +219,7 @@ class ItemsPaginationTest extends WebTestCase
         $this->assertRegExp("|offset=8|", $links['next']);
         $this->assertRegExp("|offset=8|", $links['last']);
 
-        $items = $this->getItems(4, 8);
+        $items = $this->getItems("this",4, 8);
         $links = $this->processRels($items['metadata']['links']);
 
         // checking limit
@@ -213,9 +236,9 @@ class ItemsPaginationTest extends WebTestCase
     public function testLinksOdd()
     {
 
-        $this->loadItems(11);
+        $postedItemLocation = $this->loadItems(11);
 
-        $items = $this->getItems(5);
+        $items = $this->getItems("this", 5);
 
         $links = $this->processRels($items['metadata']['links']);
 
@@ -236,7 +259,7 @@ class ItemsPaginationTest extends WebTestCase
 
 
         // requesting second page
-        $items = $this->getItems(5, 5);
+        $items = $this->getItems("this",5, 5);
         $links = $this->processRels($items['metadata']['links']);
 
         // checking limit
@@ -251,7 +274,7 @@ class ItemsPaginationTest extends WebTestCase
         $this->assertRegExp("|offset=10|", $links['next']);
         $this->assertRegExp("|offset=10|", $links['last']);
 
-        $items = $this->getItems(5, 10);
+        $items = $this->getItems("this", 5, 10);
         $links = $this->processRels($items['metadata']['links']);
 
         // checking limit
@@ -266,6 +289,82 @@ class ItemsPaginationTest extends WebTestCase
 
     }
 
+    public function testRequestAllLinks()
+    {
+        $client = static::createClient();
+
+        $postedItemLocation = $this->loadItems(11);
+
+        $items = $this->getItems("this", 5);
+
+        $links = $this->processRels($items['metadata']['links']);
+
+        // getting next page
+        $crawlerJson = $client->request('GET',
+            $links['next'],
+            array(),
+            array(),
+            array(
+                'HTTP_ACCEPT'  => 'application/json'
+            )
+        );
+
+        $items = json_decode($client->getResponse()->getContent(), true);
+        $links = $this->processRels($items['metadata']['links']);
+
+        $this->assertEquals(5, count($items['data']));
+        $this->assertEquals(4, count($links));
+
+        // getting prev page
+        $crawlerJson = $client->request('GET',
+            $links['previous'],
+            array(),
+            array(),
+            array(
+                'HTTP_ACCEPT'  => 'application/json'
+            )
+        );
+
+        $items = json_decode($client->getResponse()->getContent(), true);
+        $links = $this->processRels($items['metadata']['links']);
+
+        $this->assertEquals(5, count($items['data']));
+        $this->assertEquals(3, count($links));
+
+        // getting first page
+        $crawlerJson = $client->request('GET',
+            $links['first'],
+            array(),
+            array(),
+            array(
+                'HTTP_ACCEPT'  => 'application/json'
+            )
+        );
+
+        $items = json_decode($client->getResponse()->getContent(), true);
+        $links = $this->processRels($items['metadata']['links']);
+
+        $this->assertEquals(5, count($items['data']));
+        $this->assertEquals(3, count($links));
+
+        // getting the last page
+        $crawlerJson = $client->request('GET',
+            $links['last'],
+            array(),
+            array(),
+            array(
+                'HTTP_ACCEPT'  => 'application/json'
+            )
+        );
+
+        $items = json_decode($client->getResponse()->getContent(), true);
+        $links = $this->processRels($items['metadata']['links']);
+
+        $this->assertEquals(1, count($items['data']));
+        $this->assertEquals(3, count($links));
+
+    }
+
     private function processRels($rels){
 
         $returnArray = array();
@@ -276,40 +375,104 @@ class ItemsPaginationTest extends WebTestCase
         return $returnArray;
     }
 
-    private function getItems($limit, $offset = 0){
+    private function getItems($query, $limit, $offset = 0, $lang = 'en'){
         $client = static::createClient();
 
         $params = array(
+            'q'     => $query,
             'limit' => $limit
         );
 
+        $headers = array(
+            'HTTP_ACCEPT'  => 'application/json',
+        );
+
+        if ($lang !== false) {
+            $params['lang'] = $lang;
+        }
+
         if ($offset > 0) $params['offset'] = $offset;
 
+
         $crawlerJson = $client->request('GET',
-            '/v1/baskets/1/items',
+            '/v1/search/items',
             $params,
             array(),
-            array(
-                'HTTP_ACCEPT'  => 'application/json'
-            )
+            $headers
         );
 
         return json_decode($client->getResponse()->getContent(), true);
     }
 
+
     /**
+     * Posts to store as many items as passed as parameter
+     *
      * @param $numItems
+     * @param string $lang
      *
      * @return array|string
      */
-    private function loadItems($numItems)
+    private function loadItems($numItems, $lang = 'en', $contentNumber = 0)
     {
         $client = static::createClient();
 
+        $content = self::$contents[$contentNumber];
+
+
         for ($i = 0; $i < $numItems; $i++ ) {
             $crawler = $client->request('POST',
-                '/v1/baskets/1/items'
+                $this->itemsUrl,
+                array(
+                    "label"      => $content,
+                    'abstract'   => $content
+                ),
+                array(),
+                array(
+                    'HTTP_CONTENT_LANGUAGE'  => $lang,
+                )
             );
+        }
+
+        return $client->getResponse()->headers->get('Location');
+    }
+
+    /**
+     * Posts to store as many items as passed as parameter
+     *
+     * @param $numItems
+     * @param string $lang
+     *
+     * @return array|string
+     */
+    private function loadItemsI18n($numItems, $langs = array('en', 'it'))
+    {
+        $client = static::createClient();
+
+
+        for ($i = 0; $i < $numItems; $i++ ) {
+            $crawler = $client->request('POST',
+                $this->itemsUrl,
+                array(
+                    "content" => self::$_TEST_CONTENT
+                )
+            );
+
+            $postedItemLocation = $client->getResponse()->headers->get('Location');
+            foreach ($langs as $lang => $contentText) {
+                $crawler = $client->request('POST',
+                    $this->itemsUrl,
+                    array(
+                        "label"    => $contentText,
+                        "abstract" => $contentText,
+                        "id"       => substr($postedItemLocation , strrpos($postedItemLocation, '/') + 1)
+                    ),
+                    array(),
+                    array(
+                        'HTTP_CONTENT_LANGUAGE'  => $lang,
+                    )
+                );
+            }
         }
 
         return $client->getResponse()->headers->get('Location');
