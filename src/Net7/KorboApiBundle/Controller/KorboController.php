@@ -52,8 +52,14 @@ class KorboController extends Controller
         $this->response = new Response();
 
         $this->response->headers->set('Access-Control-Allow-Origin', "*");
-        $this->response->headers->set('Access-Control-Allow-Headers', "Origin, X-Requested-With, Content-Type, Accept");
+        $this->response->headers->set('Access-Control-Allow-Headers', "Origin, X-Requested-With, Content-Type, Accept, Access-Control-Expose-Headers");
         $this->response->headers->set('Access-Control-Allow-Methods', "GET, POST, OPTIONS");
+
+        // http://stackoverflow.com/questions/1557602/jquery-and-ajax-response-header/4236041#4236041
+        // Without using this *-Expose-Headers trick, the XMLHTTP object will NOT have access to it.
+        // The request must include an header: 'Access-Control-Expose-Headers': 'Location', then 
+        // javascript will be able to read the Location header in the response
+        $this->response->headers->set('Access-Control-Expose-Headers', "Location");
 
         $this->logger = $this->get('logger');
     }
