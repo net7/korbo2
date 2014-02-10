@@ -352,6 +352,8 @@ class Item
     public function setType($type)
     {
         $this->type = $type;
+        //$type = str_replace('"', "", $type);
+        //$this->type = serialize(explode(',', $type));
     }
 
     /**
@@ -422,8 +424,11 @@ class Item
         $this->languageCode = $languageCode;
     }
 
-
-
+    public function getTypesArray()
+    {
+        return json_decode($this->type, true);
+//        return unserialize($this->type);
+    }
 
     /**
      * Retrieves the translation of the field passed as parameter

@@ -18,5 +18,8 @@ Net7\KorboApiBundle\Entity\Item:
       expose: true
     type:
       expose: true
+      accessor:
+        getter: getTypesArray
+      type: array
     depiction:
       expose: true
