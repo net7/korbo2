@@ -140,10 +140,11 @@ class ImportFromKorboLegacyCommand extends ContainerAwareCommand
 
             $output->write("\n --> Importing item $id\n");
             $resource = ($meta[2] != null && $meta[2] != 'null') ? $meta[2] : '';
+            $depiction = ($meta[1] != null && $meta[1] != 'null') ? $meta[1] : '';
             $item = new Item();
 
             $item->setBasket($basket);
-            $item->setDepiction($meta[1]);
+            $item->setDepiction($depiction);
             $item->setType(json_encode(explode('|||', $meta[3])));
             $item->setResource($resource);
 
