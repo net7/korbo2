@@ -139,17 +139,21 @@ class ImportFromKorboLegacyCommand extends ContainerAwareCommand
         foreach ($this->items as $id => $meta ) {
 
             $output->write("\n --> Importing item $id\n");
-
+            $resource = ($meta[2] != null && $meta[2] != 'null') ? $meta[2] : '';
             $item = new Item();
 
             $item->setBasket($basket);
             $item->setDepiction($meta[1]);
             $item->setType(json_encode(explode('|||', $meta[3])));
-            $item->setResource($meta[2]);
+            $item->setResource($resource);
 
             foreach ($meta['translations'] as $lang => $translation ) {
-                $item->addTranslation(new ItemTranslation($lang, 'label', $translation[0]));
-                $item->addTranslation(new ItemTranslation($lang, 'abstract', $translation[1]));
+                $item->addTranslation(new ItemTranslation($lang, 'label', $translation[1]));
+                $t = array();
+                for ($i = 2; $i < count($translation) - 1; $i++) {
+                    $t[] = $translation[$i];
+                }
+                $item->addTranslation(new ItemTranslation($lang, 'abstract',implode(',', $t)));
             }
 
             $em->persist($item);
