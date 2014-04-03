@@ -18,4 +18,6 @@ class AbstractSearchDriver implements SearchDriver{
 
     function getEntityDetails($freebaseEntityId){}
 
+    function getPaginationMetadata() {}
+
 }

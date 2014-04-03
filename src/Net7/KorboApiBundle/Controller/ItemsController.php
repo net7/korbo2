@@ -10,6 +10,7 @@ use Doctrine\ORM\AbstractQuery;
 use FOS\RestBundle\Controller\FOSRestController;
 
 use Net7\KorboApiBundle\Entity\Basket;
+use Net7\KorboApiBundle\Libs\FreebaseSearchDriver;
 use Net7\KorboApiBundle\Utility\SearchPaginator;
 
 use Net7\KorboApiBundle\Entity\Item;
@@ -223,7 +224,15 @@ class ItemsController extends KorboI18NController
      *                  required="false",
      *                  type="string",
      *                  enum="['en', 'it', 'de']"
-     *              )
+     *              ),
+      *             @SWG\Parameter(
+      *                  name="Provider",
+      *                  description="The provider to send the request to. By default the provider is korbo.",
+      *                  paramType="header",
+      *                  required="false",
+      *                  type="string",
+      *                  enum="['korbo', 'freebase']"
+      *              )
      *          ),
      *          @SWG\ResponseMessage(code=405, message="Method not allowed"),
      *          @SWG\ResponseMessage(code=404, message="Item not found"),
@@ -235,6 +244,30 @@ class ItemsController extends KorboI18NController
     public function getAction($id, Request $request)
     {
         $em = $this->getDoctrine()->getManager();
+        $provider = $request->get("p", 'korbo');
+
+        if ($provider == 'freebase') {
+            // TODO: this portion needs a full refactoring
+            $freebaseDriver = new FreebaseSearchDriver(
+                 $this->container->getParameter('freebase_search_base_url'),
+                 $this->container->getParameter('freebase_api_key'),
+                 $this->container->getParameter('freebase_topic_base_url'),
+                 $this->container->getParameter('freebase_base_mql_url'),
+                 $this->container->getParameter('freebase_image_search'),
+                 $this->container->getParameter('freebase_languages_to_retrieve'),
+                 ''
+            );
+            $freebaseDriver->setDefaultLanguage($this->acceptLanguage, $this->container->getParameter('korbo_default_locale'));
+
+            $id = str_replace("__", "/", $id);
+
+            $jsonContent = json_encode($freebaseDriver->getEntityDetails($id), JSON_UNESCAPED_SLASHES);
+            $this->response->setContent($jsonContent);
+            $this->response->headers->set('Content-Type', 'application/json');
+
+            return $this->response;
+        }
+
 
         $item = $this->getDoctrine()
             ->getRepository('Net7KorboApiBundle:Item')
@@ -505,40 +538,59 @@ class ItemsController extends KorboI18NController
         }
         $em = $this->getDoctrine()->getManager();
 
-        $queryString = $request->get('q', false);
-        $locale = $request->get("lang", false) ;
-
         $offset = $request->get('offset', 0);
         // if no limit is passed set default page size
         $limit  = $request->get('limit', $this->container->getParameter('korbo_api_default_page_size'));
+
+        $queryString = $request->get('q', false);
+        $locale = $request->get("lang", $this->container->getParameter('korbo_default_locale'));
+
+        // Search driver
+        $searchDriver = $request->get("p", 'korbo');
+
         $baseApiPath = 'http://' . $request->getHttpHost() . $request->getPathInfo();
 
-        $items = $em->getRepository('Net7KorboApiBundle:Item')->findByLocaleAndQueryString($locale, $queryString, $limit, $offset);
+        if ($searchDriver === 'freebase') {
+            $driver = new FreebaseSearchDriver(
+                $this->container->getParameter('freebase_search_base_url'),
+                $this->container->getParameter('freebase_api_key'),
+                $this->container->getParameter('freebase_topic_base_url'),
+                $this->container->getParameter('freebase_base_mql_url'),
+                $this->container->getParameter('freebase_image_search'),
+                $this->container->getParameter('freebase_languages_to_retrieve'),
+                $baseApiPath,
+                array("limit" => $limit, 'offset' => $offset)
+            );
+            $driver->setDefaultLanguage($locale);
+            $jsonItemsArray = $driver->search($queryString);
+            $metadata = $driver->getPaginationMetadata($baseApiPath);
+            $jsonContent = '{"data":[' . json_encode($jsonItemsArray, JSON_UNESCAPED_SLASHES) . '], "metadata":' . json_encode($metadata, JSON_UNESCAPED_SLASHES) . '}';
+        } else {
+            $items = $em->getRepository('Net7KorboApiBundle:Item')->findByLocaleAndQueryString($locale, $queryString, $limit, $offset);
 
-        //print_r(count($items) . '<<<<');die;
+            $serializer  = $this->container->get('serializer');
 
-        $serializer  = $this->container->get('serializer');
+            $jsonItemsArray = array();
+            foreach ($items as $item){
+                $item->setTranslatableLocale($this->acceptLanguage);
+                $em->refresh($item);
 
-        $jsonItemsArray = array();
-        foreach ($items as $item){
-            $item->setTranslatableLocale($this->acceptLanguage);
-            $em->refresh($item);
+                $jsonItemsArray[] =  $serializer->serialize($item, 'json');
+            }
 
-            $jsonItemsArray[] =  $serializer->serialize($item, 'json');
+
+            $paginator = new SearchPaginator($em, $baseApiPath, $locale, $queryString, $limit, $offset);
+
+            $metadata = $paginator->getPaginationMetadata();
+            $jsonContent = '{"data":[' . implode(',', $jsonItemsArray) . '], "metadata":' . json_encode($metadata, JSON_UNESCAPED_SLASHES) . '}';
         }
-
-
-        $paginator = new SearchPaginator($em, $baseApiPath, $locale, $queryString, $limit, $offset);
-
-        $metadata = $paginator->getPaginationMetadata();
-
-        $jsonContent = '{"data":[' . implode(',', $jsonItemsArray) . '], "metadata":' . json_encode($metadata, JSON_UNESCAPED_SLASHES) . '}';
 
         $this->response->setContent($jsonContent);
         $this->response->headers->set('Content-Type', 'application/json');
 
         return $this->response;
     }
+
 
 
     /**

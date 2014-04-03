@@ -7,6 +7,9 @@
 namespace Net7\KorboApiBundle\Libs;
 
 
+use Net7\KorboApiBundle\Utility\FreebasePaginator;
+use Net7\OpenpalApiBundle\Tests\Controller\FreebaseSearchDriverTest;
+
 class FreebaseSearchDriver extends AbstractSearchDriver {
 
     private $freebaseApiKey;
@@ -14,6 +17,8 @@ class FreebaseSearchDriver extends AbstractSearchDriver {
     private $freebaseBaseUrl;
 
     private $defaultLanguage;
+
+    private $configurationLanguage;
 
     private $extraParameters;
 
@@ -25,7 +30,11 @@ class FreebaseSearchDriver extends AbstractSearchDriver {
 
     private $freebaseImageUrl;
 
-    public function __construct($freebaseBaseUrl, $freebaseApiKey, $freebaseTopicBaseUrl, $freebaseMqlBaseUrl, $freebaseImageUrl, $languagesToRetrieve, $extraParameters = array())
+    private $freebaseSearchHits;
+
+    private $baseApiPath;
+
+    public function __construct($freebaseBaseUrl, $freebaseApiKey, $freebaseTopicBaseUrl, $freebaseMqlBaseUrl, $freebaseImageUrl, $languagesToRetrieve, $baseApiPath, $extraParameters = array())
     {
         $this->freebaseApiKey       = $freebaseApiKey;
         $this->freebaseBaseUrl      = $freebaseBaseUrl;
@@ -33,6 +42,7 @@ class FreebaseSearchDriver extends AbstractSearchDriver {
         $this->freebaseMqlBaseUrl   = $freebaseMqlBaseUrl;
         $this->languagesToRetrieve  = $languagesToRetrieve;
         $this->freebaseImageUrl     = $freebaseImageUrl;
+        $this->baseApiPath          = $baseApiPath;
 
         if (empty($extraParameters)){
             $extraParameters = array(
@@ -48,9 +58,10 @@ class FreebaseSearchDriver extends AbstractSearchDriver {
      *
      * @param string $lang
      */
-    public function setDefaultLanguage($lang)
+    public function setDefaultLanguage($lang, $configurationLanguage = '')
     {
         $this->defaultLanguage = $lang;
+        $this->configurationLanguage = $configurationLanguage;
     }
 
 
@@ -63,11 +74,22 @@ class FreebaseSearchDriver extends AbstractSearchDriver {
     {
 
         // TODO add start / limit parameter to search url
+        $results = array();
 
         $res = $this->doFreebaseRequest($wordToSearch);
+        $arrayResult = json_decode($res, true);
 
-        print_r($res);die;
+        foreach ($arrayResult['result'] as $result) {
+            $results[] = array(
+                'available_languages' => "",//array_keys($descriptions),
+                'id' => str_replace("/", "__", $result['mid']),
+                'label' => $result['name'],
+            );
+        }
 
+        $this->freebaseSearchHits = $arrayResult['hits'];
+
+        return $results;
     }
 
     /**
@@ -145,14 +167,48 @@ class FreebaseSearchDriver extends AbstractSearchDriver {
         return $itemResponseContainer;
     }
 
+    public function getPaginationMetadata()
+    {
+        $offset = (isset($params['offset'])) ? $params['offset'] : 0;
+        $limit  = (isset($params['limit'])) ? $params['limit'] : 10;
+        $totalPages = ($limit > 0) ? ceil( $this->freebaseSearchHits / $limit ) : 0;
+
+        $freebasePagination = new FreebasePaginator($this->baseApiPath, $this->defaultLanguage, $limit, $offset);
+
+        $paginationMetadata = array(
+            "pageCount"  => $this->freebaseSearchHits,
+            "totalCount" => $this->freebaseSearchHits,
+            "offset"     => $offset,
+            "limit"      => $limit,
+            "links"      => $freebasePagination->getLinksMetadata($totalPages, $this->freebaseSearchHits),
+            "allLanguagesCount" => $this->freebaseSearchHits
+        );
+
+        return $paginationMetadata;
+    }
+
 
     public function getEntityDetails($freebaseEntityId)
     {
+        $entityMetadata = $this->getEntityMetadata("http://www.freebase.com" . $freebaseEntityId);
+        $descriptions = $entityMetadata->getDescriptions();
+        $labels = $entityMetadata->getLabels();
+        $label       = (array_key_exists($this->defaultLanguage, $labels)) ? $labels[$this->defaultLanguage] : $labels[$this->configurationLanguage];
+        $description = (array_key_exists($this->defaultLanguage, $descriptions)) ? $descriptions[$this->defaultLanguage] : $descriptions[$this->configurationLanguage];
 
-
+        return array(
+            'id'                  => $freebaseEntityId,
+            "available_languages" => array_keys($descriptions),
+            "label"               => $label,
+            'abstract'            => $description,
+            'depiction'           => $entityMetadata->getDepiction(),
+            "type"                => $entityMetadata->getTypes(),
+            "basket_id"           => null,
+        );
     }
 
-    protected function doFreebaseRequest($word, $params = array()) {
+    protected function doFreebaseRequest($word) {
+        $params = $this->extraParameters;
 
         $word = urlencode(str_replace('"', '', trim($word)));
         $requestUrl = $this->freebaseBaseUrl . $word ;
@@ -162,6 +218,10 @@ class FreebaseSearchDriver extends AbstractSearchDriver {
         $contentType = (isset($params['content-type'])) ? $params['content-type'] : 'text/html';
 
         $requestUrl .= '&lang=' . $this->defaultLanguage;
+
+        //limit
+        $requestUrl .= (isset($params['limit'])) ? "&limit=" . $params['limit'] : '';
+        $requestUrl .= (isset($params['offset'])) ? "&cursor=" . $params['offset'] : '';
 
         $request = curl_init();
         curl_setopt($request, CURLOPT_URL, $requestUrl);

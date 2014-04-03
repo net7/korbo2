@@ -53,7 +53,7 @@ class Paginator {
      *
      * @return array
      */
-    private function getLinksMetadata($totalPages, $totalNumberOfItems)
+    public function getLinksMetadata($totalPages, $totalNumberOfItems)
     {
         // no results or limit = 0
         if ($totalPages == 0) {

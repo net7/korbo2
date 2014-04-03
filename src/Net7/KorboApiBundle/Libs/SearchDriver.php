@@ -15,5 +15,6 @@ interface SearchDriver {
 
     function getEntityDetails($freebaseEntityId);
 
+    function getPaginationMetadata();
 
 }
