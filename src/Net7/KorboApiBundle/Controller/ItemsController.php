@@ -564,7 +564,7 @@ class ItemsController extends KorboI18NController
             $driver->setDefaultLanguage($locale);
             $jsonItemsArray = $driver->search($queryString);
             $metadata = $driver->getPaginationMetadata($baseApiPath);
-            $jsonContent = '{"data":[' . json_encode($jsonItemsArray, JSON_UNESCAPED_SLASHES) . '], "metadata":' . json_encode($metadata, JSON_UNESCAPED_SLASHES) . '}';
+            $jsonContent = '{"data":' . json_encode($jsonItemsArray, JSON_UNESCAPED_SLASHES) . ', "metadata":' . json_encode($metadata, JSON_UNESCAPED_SLASHES) . '}';
         } else {
             $items = $em->getRepository('Net7KorboApiBundle:Item')->findByLocaleAndQueryString($locale, $queryString, $limit, $offset);
 
