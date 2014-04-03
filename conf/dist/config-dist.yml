@@ -8,7 +8,15 @@ parameters:
   korbo_default_locale: "en"
   korbo_api_prefix: "v1"
   korbo_api_default_page_size: "10"
-
+  freebase_api_key:         "AIzaSyCmQLhkR7epHYqIiVt3y_TaAfR0tMe5JnE"
+  freebase_search_base_url:  "https://www.googleapis.com/freebase/v1/search?query="
+  freebase_topic_base_url:      "https://www.googleapis.com/freebase/v1/topic"
+  freebase_base_mql_url:     "https://www.googleapis.com/freebase/v1/mqlread?query="
+  freebase_image_search:      "https://www.googleapis.com/freebase/v1/image"
+  freebase_base_uri:          "http://www.freebase.com/view"
+  freebase_rdf_base_uri:      "http://rdf.freebase.com/rdf"
+  freebase_ns_base_uri:      "http://rdf.freebase.com/ns"
+  freebase_languages_to_retrieve: [en, fr, it, de]
 framework:
     #esi:             ~
     #translator:      { fallback: %locale% }
