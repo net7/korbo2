@@ -123,7 +123,8 @@ class FreebaseSearchDriver extends AbstractSearchDriver {
         */
 
         // setting up language array in "freebase like syntax"
-        $freebaseFormatLanguagesArray = $this->languagesToRetrieve;
+        //$freebaseFormatLanguagesArray = $this->languagesToRetrieve;
+        $freebaseFormatLanguagesArray = array($this->defaultLanguage);
         array_walk($freebaseFormatLanguagesArray, function(&$value, $key) { $value = '/lang/' . $value; });
 
         $mqlQuery = array(
@@ -151,7 +152,9 @@ class FreebaseSearchDriver extends AbstractSearchDriver {
         $itemResponseContainer->setTypes($jsonEntity['result']['type']);
 
         // STEP 2
-        foreach ($this->languagesToRetrieve as $languageToRetrieve){
+        //$langs = $this->languagesToRetrieve;
+        $langs = array($this->defaultLanguage);
+        foreach ($langs as $languageToRetrieve){
             $params = array(
                 'key' => $this->freebaseApiKey,
                 'filter' => '/common/topic/description'
@@ -198,7 +201,8 @@ class FreebaseSearchDriver extends AbstractSearchDriver {
 
         return array(
             'id'                  => $freebaseEntityId,
-            "available_languages" => array_keys($descriptions),
+//            "available_languages" => array_keys($descriptions),
+            "available_languages" => $this->languagesToRetrieve,
             "label"               => $label,
             'abstract'            => $description,
             'depiction'           => $entityMetadata->getDepiction(),
