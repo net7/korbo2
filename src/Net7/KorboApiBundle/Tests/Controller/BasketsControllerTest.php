@@ -1,6 +1,6 @@
 <?php
 
-namespace Net7\OpenpalApiBundle\Tests\Controller;
+namespace Net7\KorboApiBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 

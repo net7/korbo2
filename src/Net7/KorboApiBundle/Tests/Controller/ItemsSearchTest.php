@@ -44,10 +44,10 @@ class ItemsSearchTest extends WebTestCase
             )
         );
 
-        $items = $this->getItems('en', 20, 0, false);
+        $items = $this->getItems('it', 20, 0, 'it');
         $this->assertEquals(7, count($items['data']));
 
-        $items = $this->getItems('it', 20, 0, false);
+        $items = $this->getItems('en', 20, 0, false);
         $this->assertEquals(7, count($items['data']));
 
     }

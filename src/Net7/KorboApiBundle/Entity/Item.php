@@ -12,6 +12,7 @@ use Gedmo\Mapping\Annotation as Gedmo,
 use Doctrine\Common\Collections\ArrayCollection;
 use Net7\KorboApiBundle\Entity\ItemTranslation;
 use Net7\KorboApiBundle\Entity\Basket;
+use Symfony\Component\DependencyInjection\ContainerAware;
 
 /**
  * Item
@@ -135,6 +136,12 @@ class Item
      */
     private $basket;
 
+    /**
+     * Base Item uri (purl)
+     *
+     * @var string
+     */
+    private $baseItemUri;
 
     /**
      * Constructor
@@ -146,6 +153,17 @@ class Item
         $this->depiction      = "";
         $this->languageCode   = "";
         $this->resource       = "";
+        $this->baseItemUri    = "";
+    }
+
+    /**
+     * Sets the base item uri
+     *
+     * @param $uri
+     */
+    public function setBaseItemUri($uri)
+    {
+        $this->baseItemUri = $uri;
     }
 
     /**
@@ -428,6 +446,16 @@ class Item
     {
         return json_decode($this->type, true);
 //        return unserialize($this->type);
+    }
+
+    /**
+     * Returns a URI that represent the item
+     *
+     * @return mixed
+     */
+    public function getUri()
+    {
+        return $this->baseItemUri . $this->id;
     }
 
     /**

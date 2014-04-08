@@ -1,6 +1,6 @@
 <?php
 
-namespace Net7\OpenpalApiBundle\Tests\Controller;
+namespace Net7\KorboApiBundle\Tests\Controller;
 
 use Net7\KorboApiBundle\Entity\Basket;
 use Net7\KorboApiBundle\Libs\FreebaseSearchDriver;
@@ -46,9 +46,10 @@ class FreebaseSearchDriverTest extends WebTestCase
             $this->container->getParameter("freebase_topic_base_url"),
             $this->container->getParameter("freebase_base_mql_url"),
             $this->container->getParameter("freebase_image_search"),
-            $this->container->getParameter("freebase_languages_to_retrieve")
+            $this->container->getParameter("freebase_languages_to_retrieve"),
+            ''
         );
-
+        $searchDriver->setDefaultLanguage("en");
         $searchDriver->getEntityMetadata(self::$_URL_TO_IMPORT_FULL . '11111');
     }
 
@@ -65,9 +66,10 @@ class FreebaseSearchDriverTest extends WebTestCase
             $this->container->getParameter("freebase_topic_base_url"),
             $this->container->getParameter("freebase_base_mql_url"),
             $this->container->getParameter("freebase_image_search"),
-            $this->container->getParameter("freebase_languages_to_retrieve")
+            $this->container->getParameter("freebase_languages_to_retrieve"),
+            ''
         );
-
+        $searchDriver->setDefaultLanguage("en");
         $searchDriver->getEntityMetadata('/m/0sxbv4d111');
     }
 
@@ -82,14 +84,17 @@ class FreebaseSearchDriverTest extends WebTestCase
             $this->container->getParameter("freebase_topic_base_url"),
             $this->container->getParameter("freebase_base_mql_url"),
             $this->container->getParameter("freebase_image_search"),
-            $this->container->getParameter("freebase_languages_to_retrieve")
+            $this->container->getParameter("freebase_languages_to_retrieve"),
+            '',
+            array("limit" => 10, 'offset' => 0)
         );
 
         /* @var ItemResponseContainer OBAMA */
+        $searchDriver->setDefaultLanguage("en");
         $itemResponseContainer = $searchDriver->getEntityMetadata(self::$_URL_TO_IMPORT_FULL);
 
-        $this->assertEquals(4, count($itemResponseContainer->getLabels()));
-        $this->assertEquals(4, count($itemResponseContainer->getDescriptions()));
+        $this->assertEquals(1, count($itemResponseContainer->getLabels()));
+        $this->assertEquals(1, count($itemResponseContainer->getDescriptions()));
         $this->assertEquals($this->container->getParameter("freebase_image_search") . "/m/02mjmr", $itemResponseContainer->getDepiction());
 
         // at least one type

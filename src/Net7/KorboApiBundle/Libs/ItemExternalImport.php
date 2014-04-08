@@ -20,12 +20,15 @@ class ItemExternalImport {
 
     private $container;
 
-    public function __construct($resourceToImport, Item $item, $isSync, $container)
+    private $language;
+
+    public function __construct($resourceToImport, Item $item, $isSync, $container, $lang = '')
     {
         $this->isSync           = $isSync;
         $this->item             = $item;
         $this->resourceToImport = $resourceToImport;
         $this->container        = $container;
+        $this->language         = $lang;
     }
 
     /**
@@ -61,14 +64,18 @@ class ItemExternalImport {
     {
         if ($this->isResourceValid())
         {
-            return new FreebaseSearchDriver(
+            $driver  = new FreebaseSearchDriver(
                                        $this->container->getParameter("freebase_search_base_url"),
                                        $this->container->getParameter("freebase_api_key"),
                                        $this->container->getParameter("freebase_topic_base_url"),
                                        $this->container->getParameter("freebase_base_mql_url"),
                                        $this->container->getParameter("freebase_image_search"),
-                                       $this->container->getParameter("freebase_languages_to_retrieve")
+                                       $this->container->getParameter("freebase_languages_to_retrieve"),
+                                       ''
                 );
+            $driver->setDefaultLanguage($this->language);
+
+            return $driver;
         } else {
             throw new \Exception("No driver found for the resource {$this->resourceToImport}");
         }

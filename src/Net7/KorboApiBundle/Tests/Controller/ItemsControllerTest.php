@@ -1,6 +1,6 @@
 <?php
 
-namespace Net7\OpenpalApiBundle\Tests\Controller;
+namespace Net7\KorboApiBundle\Tests\Controller;
 
 use Net7\KorboApiBundle\Entity\Basket;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -79,6 +79,7 @@ class ItemsControllerTest extends WebTestCase
         $this->assertTrue(array_key_exists('abstract', $item));
         $this->assertTrue(array_key_exists('type', $item));
         $this->assertTrue(array_key_exists('depiction', $item));
+        $this->assertTrue(array_key_exists('uri', $item));
         $this->assertTrue(array_key_exists('language_code', $item));
         $this->assertTrue(array_key_exists('available_languages', $item));
 

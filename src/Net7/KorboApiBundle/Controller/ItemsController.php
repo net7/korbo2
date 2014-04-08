@@ -162,6 +162,7 @@ class ItemsController extends KorboI18NController
         $jsonItemArray = array();
         foreach ($items as $item){
             $item->setTranslatableLocale($this->acceptLanguage);
+            $item->setBaseItemUri($this->container->getParameter('korbo_base_purl_uri'));
             $em->refresh($item);
 
             $jsonItemArray[] =  $serializer->serialize($item, 'json');
@@ -291,6 +292,7 @@ class ItemsController extends KorboI18NController
         $em->refresh($item);
 
         $item->setLanguageCode($this->acceptLanguage);
+        $item->setBaseItemUri($this->container->getParameter('korbo_base_purl_uri'));
 
         if ($this->accept->has('application/json')) {
             $serializer  = $this->container->get('serializer');
@@ -431,7 +433,7 @@ class ItemsController extends KorboI18NController
             $this->checkAndSetField('type', $request, $item, array());
         } else {
             // new resource to import
-            $itemImporter = new ItemExternalImport($resourceToImport, $item, $importResourceSynchronously, $this->container);
+            $itemImporter = new ItemExternalImport($resourceToImport, $item, $importResourceSynchronously, $this->container, $this->acceptLanguage);
 
             try{
                 $itemImporter->importResource();
@@ -573,6 +575,7 @@ class ItemsController extends KorboI18NController
             $jsonItemsArray = array();
             foreach ($items as $item){
                 $item->setTranslatableLocale($this->acceptLanguage);
+                $item->setBaseItemUri($this->container->getParameter('korbo_base_purl_uri'));
                 $em->refresh($item);
 
                 $jsonItemsArray[] =  $serializer->serialize($item, 'json');
@@ -583,6 +586,7 @@ class ItemsController extends KorboI18NController
 
             $metadata = $paginator->getPaginationMetadata();
             $jsonContent = '{"data":[' . implode(',', $jsonItemsArray) . '], "metadata":' . json_encode($metadata, JSON_UNESCAPED_SLASHES) . '}';
+
         }
 
         $this->response->setContent($jsonContent);

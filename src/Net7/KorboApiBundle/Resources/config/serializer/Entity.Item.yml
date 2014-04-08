@@ -5,6 +5,7 @@ Net7\KorboApiBundle\Entity\Item:
     getAvailableLanguages: {}
     getLanguageCode: {}
     getBasketId: {}
+    getUri: {}
   properties:
     id:
       expose: true
