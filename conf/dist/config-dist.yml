@@ -9,6 +9,7 @@ parameters:
   korbo_api_prefix: "v1"
   korbo_api_default_page_size: "10"
   freebase_api_key:         "AIzaSyCmQLhkR7epHYqIiVt3y_TaAfR0tMe5JnE"
+  korbo_base_purl_uri:         "http://purl.org/net7/korbo/item/"
   freebase_search_base_url:  "https://www.googleapis.com/freebase/v1/search?query="
   freebase_topic_base_url:      "https://www.googleapis.com/freebase/v1/topic"
   freebase_base_mql_url:     "https://www.googleapis.com/freebase/v1/mqlread?query="
