@@ -91,6 +91,10 @@ AjaxSolr.ResultWidget = AjaxSolr.AbstractWidget.extend({
           }
       }
 
+      if (doc.depiction_s != ''){
+          snippet += '<img class="result-img" src="'+doc.depiction_s+'"/>';
+      }
+
     if (abastract.length > 300) {
       snippet +=  abastract.substring(0, 300);
       snippet += '<span style="display:none;">' + abastract.substring(300);

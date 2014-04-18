@@ -158,3 +158,8 @@ font-size: 170%;
 a.tagcloud_size_10 {
 font-size: 180%;
 }
+
+.result-img{
+    float:left;
+    width:30px;
+}
