@@ -269,7 +269,7 @@ AjaxSolr.ParameterStore = AjaxSolr.Class.extend(
       }
     }
 
-    params.push('basket_id_s:'+basket_id)
+    params.push('fq=basket_id_s:'+basket_id)
 
     return params.join('&');
   },

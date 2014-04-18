@@ -30,6 +30,7 @@ AjaxSolr.CurrentSearchWidget = AjaxSolr.AbstractWidget.extend({
     var fq = this.manager.store.values('fq');
     for (var i = 0, l = fq.length; i < l; i++) {
         if (fq[i] != 'basket_id_s:' + basket_id){
+
             links.push($('<a href="#"></a>').text('(x) ' + fq[i]).click(self.removeFacet(fq[i])));
         }
     }
@@ -38,9 +39,11 @@ AjaxSolr.CurrentSearchWidget = AjaxSolr.AbstractWidget.extend({
       links.unshift($('<a href="#"></a>').text('remove all').click(function () {
 
 //          self.manager.store.get('q').val('basket_id_s:'+basket_id);
-          self.manager.store.get('q').val('*:*');
+        self.manager.store.get('q').val('*:*');
         self.manager.store.remove('fq');
-        self.manager.store.addByValue('fq', 'basket_id_s='+basket_id);
+
+
+        self.manager.store.addByValue('fq', 'basket_id_s:'+basket_id);
 
 
           self.doRequest();

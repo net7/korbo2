@@ -81,7 +81,6 @@ AjaxSolr.ResultWidget = AjaxSolr.AbstractWidget.extend({
 //      snippet += doc.dateline + ' ' + doc.text;
 //    }
        var abstract = '';
-console.log(doc.abstract_txt);
 
       if (typeof(doc.abstract_txt)!='undefined'){
           if (doc.abstract_txt.length > 1){
@@ -90,7 +89,6 @@ console.log(doc.abstract_txt);
               abstract = doc.abstract_txt;
           }
       }
-      console.log(abstract);
 
       if (doc.depiction_s != ''){
           snippet += '<img class="result-img" src="'+doc.depiction_s+'"/>';
