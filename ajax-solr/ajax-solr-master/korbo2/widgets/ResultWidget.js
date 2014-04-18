@@ -80,28 +80,29 @@ AjaxSolr.ResultWidget = AjaxSolr.AbstractWidget.extend({
 //    else {
 //      snippet += doc.dateline + ' ' + doc.text;
 //    }
-       var abastract = '';
-
+       var abstract = '';
+console.log(doc.abstract_txt);
 
       if (typeof(doc.abstract_txt)!='undefined'){
           if (doc.abstract_txt.length > 1){
-              abastract = doc.abstract_txt[0];
+              abstract = doc.abstract_txt[0];
           } else {
-              abastract = doc.abstract_txt;
+              abstract = doc.abstract_txt;
           }
       }
+      console.log(abstract);
 
       if (doc.depiction_s != ''){
           snippet += '<img class="result-img" src="'+doc.depiction_s+'"/>';
       }
 
-    if (abastract.length > 300) {
-      snippet +=  abastract.substring(0, 300);
-      snippet += '<span style="display:none;">' + abastract.substring(300);
+    if (abstract.length > 300) {
+      snippet +=  abstract.substring(0, 300);
+      snippet += '<span style="display:none;">' + abstract.substring(300);
       snippet += '</span> <a href="#" class="more">more</a>';
     }
     else {
-      snippet +=  doc.abastract;
+      snippet +=  abstract;
     }
 
       var label = '';
