@@ -64,14 +64,14 @@ class IndexSolrCommand extends ContainerAwareCommand
         );
 
 
-        $config = array(
+/*        $config = array(
             'default' => array(
                 'host' => 'localhost',
                 'port' => 8983,
                 'path' => '/solr/',
             )
         );
-
+*/
         $client = new Client(array('endpoint' => $config));
         $update = $client->createUpdate();
 
