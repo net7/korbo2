@@ -53,7 +53,7 @@ class ImportFromKorboLegacyCommand extends ContainerAwareCommand
 		$this
 			->setName('korbo:import:from:korbo:legacy')
             ->addArgument('file-name', InputArgument::REQUIRED, 'path/to/main/import/file/name')
-            ->addArgument('basket-name', InputArgument::OPTIONAL, 'path/to/main/import/file/name', 'XXX')
+            ->addArgument('basket-name', InputArgument::OPTIONAL, 'basket name', 'XXX')
 
         ;
 	}
@@ -99,7 +99,7 @@ class ImportFromKorboLegacyCommand extends ContainerAwareCommand
 		$file = fopen($this->path,'r');
 		$csv = array();
 
-		while (($result = fgetcsv($file,0,',',"'")) !== false)
+		while (($result = fgetcsv($file,0, ",", '"')) !== false)
 		{
             // costruisco hash
 			$csv[$result[0]] = $result;
@@ -112,7 +112,12 @@ class ImportFromKorboLegacyCommand extends ContainerAwareCommand
             if (file_exists($filename)) {
                 $file = fopen($filename,'r');
 
-                while (($result = fgetcsv($file,0,',',"'")) !== false)
+                /*while (($line = fgets($file)) !== false) {
+                    $csv[$result[0]]['translations'][$lang] = explode(",", $line);
+                    print_r(explode(",", $line));
+                    // process the line read.
+                }*/
+                while (($result = fgetcsv($file,0,',','"')) !== false)
                 {
                     $csv[$result[0]]['translations'][$lang] =  $result;
                 }
@@ -136,6 +141,10 @@ class ImportFromKorboLegacyCommand extends ContainerAwareCommand
         $em->persist($basket);
         $em->flush();
 
+        // output file per import su dl
+        $fp = fopen('/tmp/mapping_korbo1_korbo2.csv', 'w');
+
+
         foreach ($this->items as $id => $meta ) {
 
             $output->write("\n --> Importing item $id\n");
@@ -147,24 +156,37 @@ class ImportFromKorboLegacyCommand extends ContainerAwareCommand
             $item->setDepiction($depiction);
             $item->setType(json_encode(explode('|||', $meta[3])));
             $item->setResource($resource);
-
             foreach ($meta['translations'] as $lang => $translation ) {
-                $item->addTranslation(new ItemTranslation($lang, 'label', $translation[1]));
+                if (isset($translation[1])) {
+                    $label = (isset($translation[1][1]) && strpos($translation[1][1], '"') === 0) ? substr($translation[1], 1, -1) : $translation[1];
+                    $item->addTranslation(new ItemTranslation($lang, 'label', $label));
+                }
                 $t = array();
-                for ($i = 2; $i < count($translation) - 1; $i++) {
-                    $t[] = $translation[$i];
+                /*for ($i = 2; $i < count($translation) - 1; $i++) {
+                    $label = (strpos($translation[$i][1], '"') === 0) ? substr($translation[$i], 1, -1) : $translation[$i];
+                    $output->write($label);
+                    $t[] = $label;
                 }
                 $item->addTranslation(new ItemTranslation($lang, 'abstract',implode(',', $t)));
+            */
+                if (isset($translation[2])) {
+                    $label = (isset($translation[2][1]) && strpos($translation[2][1], '"') === 0) ? substr($translation[2], 1, -1) : $translation[2];
+                    $item->addTranslation(new ItemTranslation($lang, 'abstract', $label));
+                }
             }
+
 
             $em->persist($item);
             $em->flush();
 
+            fputcsv($fp, array($item->getId(), $id));
 
         }
+        fclose($fp);
 
 
-	}
+
+    }
 
 	
 
