@@ -132,7 +132,6 @@ class Item
      * @ORM\ManyToOne(targetEntity="Basket", inversedBy="items")
      * @ORM\JoinColumn(name="basket_id", referencedColumnName="id")
      *
-     *  @Solr\Field(type="integer")
      */
     private $basket;
 
@@ -155,6 +154,12 @@ class Item
         $this->resource       = "";
         $this->baseItemUri    = "";
     }
+
+
+
+   public function getSOLRBasketId(){
+       return $this->getBasketId();
+   }
 
     /**
      * Sets the base item uri
@@ -362,6 +367,16 @@ class Item
     public function getLabel()
     {
         return $this->label;
+    }
+
+    /**
+     * Retrieves all the translations (used to index SOLR)
+     *
+     * @return string
+     */
+    public function getLabelTranslations()
+    {
+        return $this->getFieldTranslations("label");
     }
 
     /**

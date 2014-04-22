@@ -97,6 +97,11 @@ class ImportFromKorboLegacyCommand extends ContainerAwareCommand
 
 		// READ csv and fill $this->items
 		$file = fopen($this->path,'r');
+
+        if ($file === false ){
+            echo "\r\n\r\n error opening " . $this->path . "\r\n\r\n";
+            exit();
+        }
 		$csv = array();
 
 		while (($result = fgetcsv($file,0, ",", '"')) !== false)
