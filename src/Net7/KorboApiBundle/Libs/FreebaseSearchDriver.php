@@ -193,7 +193,8 @@ class FreebaseSearchDriver extends AbstractSearchDriver {
 
     public function getEntityDetails($freebaseEntityId)
     {
-        $entityMetadata = $this->getEntityMetadata("http://www.freebase.com" . $freebaseEntityId);
+        $freebaseUri = "http://www.freebase.com" . $freebaseEntityId;
+        $entityMetadata = $this->getEntityMetadata($freebaseUri );
         $descriptions = $entityMetadata->getDescriptions();
         $labels = $entityMetadata->getLabels();
         $label       = (array_key_exists($this->defaultLanguage, $labels)) ? $labels[$this->defaultLanguage] : $labels[$this->configurationLanguage];
@@ -204,6 +205,7 @@ class FreebaseSearchDriver extends AbstractSearchDriver {
 //            "available_languages" => array_keys($descriptions),
             "available_languages" => $this->languagesToRetrieve,
             "label"               => $label,
+            "resource"            => $freebaseUri,
             'abstract'            => $description,
             'depiction'           => $entityMetadata->getDepiction(),
             "type"                => $entityMetadata->getTypes(),
