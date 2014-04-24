@@ -143,6 +143,9 @@ class ItemsController extends KorboI18NController
             return $this->response;
         }
 
+        $resource = $request->get("resource", false);
+        $countQueryParameters = array();
+
         $offset = $request->get('offset', 0);
         // if no limit is passed set default page size
         $limit  = $request->get('limit', $this->container->getParameter('korbo_api_default_page_size'));
@@ -150,12 +153,29 @@ class ItemsController extends KorboI18NController
 
         $em = $this->getDoctrine()->getManager();
 
-        $items = $em->createQuery(
+        // TODO: remove from here insert all in a table funtion
+        $where  = '';
+        if ($resource) {
+            $where = ' WHERE i.resource = :resource';
+            $countQueryParameters = array("resource" => array(
+                'operator' => '=',
+                'placeholder' => ":resource",
+                'value' => $resource
+            ));
+        }
+
+        $q = $em->createQuery(
             'SELECT i
-             FROM Net7KorboApiBundle:Item i')
+             FROM Net7KorboApiBundle:Item i' . $where)
             ->setMaxResults($limit)
-            ->setFirstResult($offset)
-            ->getResult();
+            ->setFirstResult($offset);
+
+        if ($resource) {
+            $q->setParameter("resource", $resource);
+        }
+
+        die($q->getSQLQuery());
+        $items = $q->getResult();
 
         $serializer  = $this->container->get('serializer');
 
@@ -168,7 +188,8 @@ class ItemsController extends KorboI18NController
             $jsonItemArray[] =  $serializer->serialize($item, 'json');
         }
 
-        $paginator = new ItemsPaginator($em->createQuery(ItemRepository::getItemsCountQueryString()), $baseApiPath, $limit, $offset);
+
+        $paginator = new ItemsPaginator(ItemRepository::createItemsCountQuery($em, $countQueryParameters), $baseApiPath, $limit, $offset);
         $metadata = $paginator->getPaginationMetadata();
 
         $jsonContent = '{"data":[' . implode(',', $jsonItemArray) . '], "metadata":' . json_encode($metadata, JSON_UNESCAPED_SLASHES) . '}';
@@ -432,6 +453,7 @@ class ItemsController extends KorboI18NController
             $this->checkAndSetField('depiction', $request, $item);
             $this->checkAndSetField('type', $request, $item, array());
         } else {
+            // TODO: la risorsa viene copiata a partire dalla url del provider nn vengono considerati i campi editati dal widget
             // new resource to import
             $itemImporter = new ItemExternalImport($resourceToImport, $item, $importResourceSynchronously, $this->container, $this->acceptLanguage);
 

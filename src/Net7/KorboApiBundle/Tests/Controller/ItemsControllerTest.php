@@ -44,6 +44,28 @@ class ItemsControllerTest extends WebTestCase
         $this->em->close();
     }
 
+    /*
+     *
+     * Call the /items api requesting the extra parameter resource
+     */
+    public function testItemResourceRequest()
+    {
+        $client = static::createClient();
+
+        $crawler = $client->request('GET',
+            '/v1/items?resource=http://purl.org/net7/korbo/item/68429',
+            array(),
+            array(),
+            array(
+                'HTTP_ACCEPT'  => 'application/json'
+            )
+        );
+
+        $item = json_decode($client->getResponse()->getContent(), true);
+
+        print_r($item);die;
+
+    }
 
     public function testGetItemDetails()
     {
@@ -283,9 +305,9 @@ class ItemsControllerTest extends WebTestCase
                 '*'
             )
         );
-
-
     }
+
+
 
     private function loadBasket($label)
     {

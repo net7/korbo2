@@ -148,6 +148,27 @@ ___SQL;
                  FROM Net7KorboApiBundle:Item l';
     }
 
+    public static function createItemsCountQuery($em, $parameters = array()) {
+        $queryString = self::getItemsCountQueryString();
+        $params = array();
+        if (count($parameters) > 0){
+            $queryString .= " WHERE ";
+            foreach ($parameters as $parameter => $value) {
+                $params[] = 'l.' . $parameter . $value['operator'] . $value['placeholder'];
+            }
+        }
+
+        $q = $em->createQuery($queryString . implode(" AND ", $params));
+        //die ($queryString . implode(" AND ", $params));
+        if (count($parameters) > 0){
+            foreach ($parameters as $parameter => $value) {
+                $q->setParameter($value["placeholder"], $value['value']);
+            }
+        }
+
+        return $q;
+    }
+
 
 
 }

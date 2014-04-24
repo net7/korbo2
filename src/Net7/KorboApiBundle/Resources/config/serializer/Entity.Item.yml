@@ -6,6 +6,7 @@ Net7\KorboApiBundle\Entity\Item:
     getLanguageCode: {}
     getBasketId: {}
     getUri: {}
+
   properties:
     id:
       expose: true
@@ -24,3 +25,7 @@ Net7\KorboApiBundle\Entity\Item:
       type: array
     depiction:
       expose: true
+    resource:
+      expose: true
+      accessor:
+        getter: getResourceIfPresent

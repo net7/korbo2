@@ -200,6 +200,15 @@ class Item
         return $this->resource;
     }
 
+    public function getResourceIfPresent()
+    {
+        if ($this->resource) {
+            return $this->resource;
+        }
+
+        return $this->getUri();
+
+    }
 
 
     /**
