@@ -63,7 +63,7 @@ class ItemsControllerTest extends WebTestCase
 
         $item = json_decode($client->getResponse()->getContent(), true);
 
-        print_r($item);die;
+        //print_r($item);die;
 
     }
 

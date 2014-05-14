@@ -11,6 +11,7 @@ use FOS\RestBundle\Controller\FOSRestController;
 
 use Net7\KorboApiBundle\Entity\Basket;
 use Net7\KorboApiBundle\Libs\FreebaseSearchDriver;
+use Net7\KorboApiBundle\Libs\SearchDriverFactory;
 use Net7\KorboApiBundle\Utility\SearchPaginator;
 
 use Net7\KorboApiBundle\Entity\Item;
@@ -174,7 +175,7 @@ class ItemsController extends KorboI18NController
             $q->setParameter("resource", $resource);
         }
 
-        die($q->getSQLQuery());
+        //die($q->getSQLQuery());
         $items = $q->getResult();
 
         $serializer  = $this->container->get('serializer');
@@ -268,22 +269,15 @@ class ItemsController extends KorboI18NController
         $em = $this->getDoctrine()->getManager();
         $provider = $request->get("p", 'korbo');
 
-        if ($provider == 'freebase') {
+        if ($provider !== 'korbo') {
             // TODO: this portion needs a full refactoring
-            $freebaseDriver = new FreebaseSearchDriver(
-                 $this->container->getParameter('freebase_search_base_url'),
-                 $this->container->getParameter('freebase_api_key'),
-                 $this->container->getParameter('freebase_topic_base_url'),
-                 $this->container->getParameter('freebase_base_mql_url'),
-                 $this->container->getParameter('freebase_image_search'),
-                 $this->container->getParameter('freebase_languages_to_retrieve'),
-                 ''
-            );
-            $freebaseDriver->setDefaultLanguage($this->acceptLanguage, $this->container->getParameter('korbo_default_locale'));
+            $driver = SearchDriverFactory::createInstance($provider, $this->container);
+
+            $driver->setDefaultLanguage($this->acceptLanguage, $this->container->getParameter('korbo_default_locale'));
 
             $id = str_replace("__", "/", $id);
 
-            $jsonContent = json_encode($freebaseDriver->getEntityDetails($id), JSON_UNESCAPED_SLASHES);
+            $jsonContent = json_encode($driver->getEntityDetails($id), JSON_UNESCAPED_SLASHES);
             $this->response->setContent($jsonContent);
             $this->response->headers->set('Content-Type', 'application/json');
 
@@ -574,17 +568,8 @@ class ItemsController extends KorboI18NController
 
         $baseApiPath = 'http://' . $request->getHttpHost() . $request->getPathInfo();
 
-        if ($searchDriver === 'freebase') {
-            $driver = new FreebaseSearchDriver(
-                $this->container->getParameter('freebase_search_base_url'),
-                $this->container->getParameter('freebase_api_key'),
-                $this->container->getParameter('freebase_topic_base_url'),
-                $this->container->getParameter('freebase_base_mql_url'),
-                $this->container->getParameter('freebase_image_search'),
-                $this->container->getParameter('freebase_languages_to_retrieve'),
-                $baseApiPath,
-                array("limit" => $limit, 'offset' => $offset)
-            );
+        if ($searchDriver !== 'korbo') {
+            $driver = SearchDriverFactory::createInstance($searchDriver, $this->container, $baseApiPath, $limit, $offset);
             $driver->setDefaultLanguage($locale);
             $jsonItemsArray = $driver->search($queryString);
             $metadata = $driver->getPaginationMetadata($baseApiPath);
