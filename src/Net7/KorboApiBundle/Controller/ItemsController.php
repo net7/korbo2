@@ -542,7 +542,7 @@ class ItemsController extends KorboI18NController
      *                  name="basketId",
      *                  description="BasketId",
      *                  paramType="query",
-     *                  required="true",
+     *                  required="false",
      *                  format="string",
      *                  type="string"
      *              )
