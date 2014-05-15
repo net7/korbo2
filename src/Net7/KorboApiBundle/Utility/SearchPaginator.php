@@ -17,10 +17,11 @@ use Net7\KorboApiBundle\Entity\ItemRepository;
  *
  * @package Net7\KorboApiBundle\Utility
  */
-class SearchPaginator extends Paginator{
+class SearchPaginator extends Paginator {
 
     private $em;
     private $queryString;
+    private $basketId;
 
     /**
      * Default construcutor
@@ -31,15 +32,17 @@ class SearchPaginator extends Paginator{
      * @param $queryString
      * @param int $limit
      * @param int $offset
+     * @param int $basketId
      */
-    public function __construct($em, $baseApiPath, $locale, $queryString, $limit = 0, $offset = 0)
+    public function __construct($em, $baseApiPath, $locale, $queryString, $limit = 0, $offset = 0, $basketId = false)
     {
         $this->setBaseApiPath($baseApiPath);
         $this->setOffset($offset);
         $this->setLimit($limit);
         $this->em = $em;
         $this->queryString = $queryString;
-        $baseQuery = ItemRepository::getSearchItemsCountQuery($em, $locale, $queryString);
+        $this->basketId = $basketId;
+        $baseQuery = ItemRepository::getSearchItemsCountQuery($em, $locale, $queryString, $basketId);
 
         $this->setBaseQuery($baseQuery);
     }
@@ -48,7 +51,7 @@ class SearchPaginator extends Paginator{
     {
         $metadata = parent::getPaginationMetadata();
 
-        $allLanguagesCount = ItemRepository::getSearchItemsCountQuery($this->em, false, $this->queryString)->getSingleScalarResult();
+        $allLanguagesCount = ItemRepository::getSearchItemsCountQuery($this->em, false, $this->queryString, $this->basketId)->getSingleScalarResult();
 
         $metadata['allLanguagesCount'] = $allLanguagesCount;
 

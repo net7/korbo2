@@ -46,12 +46,13 @@ class ItemRepository extends EntityRepository{
      *
      * @param $locale
      * @param $queryString
-    *
+     * @param $basketId
+     *
      * @return mixed
      */
-    public function countItemsByLocaleAndQueryString($locale, $queryString)
+    public function countItemsByLocaleAndQueryString($locale, $queryString, $basketId = false)
     {
-        return $this->getItemsByLocaleAndQueryStringQuery($queryString, $locale)->getSingleScalarResult();
+        return $this->getItemsByLocaleAndQueryStringQuery($queryString, $locale, false, $basketId)->getSingleScalarResult();
     }
 
     /**
@@ -61,12 +62,13 @@ class ItemRepository extends EntityRepository{
      * @param $queryString
      * @param bool $limit
      * @param bool $offset
+     * @param integer $basketId
      *
      * @return array
      */
-    public function findByLocaleAndQueryString($locale, $queryString, $limit = false, $offset = false)
+    public function findByLocaleAndQueryString($locale, $queryString, $limit = false, $offset = false, $basketId = false)
     {
-        $query = $this->getItemsByLocaleAndQueryStringQuery($queryString, $locale);
+        $query = $this->getItemsByLocaleAndQueryStringQuery($queryString, $locale, false, $basketId);
 
         if ($limit !== false) {
             $query->setMaxResults($limit);
@@ -91,19 +93,20 @@ class ItemRepository extends EntityRepository{
      *
      * @return \Doctrine\ORM\Query
      */
-    private function getItemsByLocaleAndQueryStringQuery($queryString, $locale = false, $isCount = false)
+    private function getItemsByLocaleAndQueryStringQuery($queryString, $locale = false, $isCount = false, $basketId = false)
     {
 
         $select  = ($isCount) ? 'count(distinct it.object)' : 'i';
         $localeQueryPart = ($locale) ? "it.locale = '{$locale}' AND" : '';
+        $basketIdQueryPart = ($basketId) ? "i.basket_id= '{$basketId}' AND" : '';
         $groupBy = ($isCount) ? '' :  "GROUP BY i.id" ;
-        //$localeQueryPart =  '';
 
         $dql = <<<___SQL
               SELECT {$select}
               FROM Net7KorboApiBundle:Item i
               JOIN i.translations it
               WHERE
+                {$basketIdQueryPart}
                 {$localeQueryPart}
                 ((it.field = 'label' AND it.content like '%{$queryString}%') OR
                 (it.field = 'abstract' AND it.content like '%{$queryString}%'))
@@ -127,19 +130,19 @@ ___SQL;
         return $query;
     }
 
-    public static function getSearchItemsCountQuery($em, $locale, $queryString)
+    public static function getSearchItemsCountQuery($em, $locale, $queryString, $basketId = false)
     {
         $i = new ItemRepository($em, new ClassMetadata( 'Net7KorboApiBundle:Item'));
 
-        return $i->getItemsByLocaleAndQueryStringQuery($queryString, $locale, true);
+        return $i->getItemsByLocaleAndQueryStringQuery($queryString, $locale, true, $basketId);
     }
 
 
-    public static function getSearchItemsQuery($em, $locale, $queryString)
+    public static function getSearchItemsQuery($em, $locale, $queryString, $basketId = false)
     {
         $i = new ItemRepository($em, new ClassMetadata( 'Net7KorboApiBundle:Item'));
 
-        return $i->getItemsByLocaleAndQueryStringQuery($queryString, $locale);
+        return $i->getItemsByLocaleAndQueryStringQuery($queryString, $locale, false, $basketId);
     }
 
     public static function getItemsCountQueryString()

@@ -154,7 +154,7 @@ class ItemsController extends KorboI18NController
 
         $em = $this->getDoctrine()->getManager();
 
-        // TODO: remove from here insert all in a table funtion
+        // TODO: remove from here insert all in a table function
         $where  = '';
         if ($resource) {
             $where = ' WHERE i.resource = :resource';
@@ -537,9 +537,15 @@ class ItemsController extends KorboI18NController
      *                  format="string",
      *                  type="string",
      *                  enum="['en', 'it', 'de']"
+     *              ),
+     *            @SWG\Parameter(
+     *                  name="basketId",
+     *                  description="BasketId",
+     *                  paramType="query",
+     *                  required="true",
+     *                  format="string",
+     *                  type="string"
      *              )
-
-     *
      *          )
      *     )
      *   )
@@ -554,6 +560,8 @@ class ItemsController extends KorboI18NController
 
             return $this->response;
         }
+        $basketId = $request->get('basketId', false);
+
         $em = $this->getDoctrine()->getManager();
 
         $offset = $request->get('offset', 0);
@@ -575,7 +583,7 @@ class ItemsController extends KorboI18NController
             $metadata = $driver->getPaginationMetadata($baseApiPath);
             $jsonContent = '{"data":' . json_encode($jsonItemsArray, JSON_UNESCAPED_SLASHES) . ', "metadata":' . json_encode($metadata, JSON_UNESCAPED_SLASHES) . '}';
         } else {
-            $items = $em->getRepository('Net7KorboApiBundle:Item')->findByLocaleAndQueryString($locale, $queryString, $limit, $offset);
+            $items = $em->getRepository('Net7KorboApiBundle:Item')->findByLocaleAndQueryString($locale, $queryString, $limit, $offset, $basketId);
 
             $serializer  = $this->container->get('serializer');
 
