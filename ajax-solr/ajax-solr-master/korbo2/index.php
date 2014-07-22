@@ -9,12 +9,18 @@
         var basket_id = '<?php echo $_GET['basket_id'];?>';
     </script>
 
+    <link rel="stylesheet" href="http://dev.thepund.it/download/client/last-beta/pundit2.css" type="text/css">
+    <script src="http://dev.thepund.it/download/client/last-beta/libs.js" type="text/javascript" ></script>
+    <script src="http://dev.thepund.it/download/client/last-beta/pundit2.js" type="text/javascript" ></script>
+    <script src="http://dev.thepund.it/download/client/last-beta/korboee_conf.js" type="text/javascript" ></script>
+
 
   <link rel="stylesheet" href="css/reuters.css">
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
   <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.24/jquery-ui.min.js"></script>
   <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.24/themes/smoothness/jquery-ui.css">
   <script data-main="js/korbo2" src="http://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.5/require.min.js"></script>
+
 </head>
 <body>
   <div id="wrap"> 
@@ -46,9 +52,10 @@
       <h2>Types</h2>
       <div class="tagcloud" id="type_ss"></div>
 
+<!--
       <h2>Resources</h2>
       <div class="tagcloud" id="resource_s"></div>
-
+-->
 
       <div class="clear"></div>
     </div>

@@ -26,18 +26,22 @@ AjaxSolr.TagcloudWidget = AjaxSolr.AbstractFacetWidget.extend({
       objectedItems.push({ facet: facet, count: count });
     }
     objectedItems.sort(function (a, b) {
-      return a.facet < b.facet ? -1 : 1;
+//      return a.facet < b.facet ? -1 : 1;
+      return a.count > b.count? -1 : 1;
     });
 
     $(this.target).empty();
     for (var i = 0, l = objectedItems.length; i < l; i++) {
       var facet = objectedItems[i].facet;
-      $(this.target).append(
-        $('<a href="#" class="tagcloud_item"></a>')
-        .text(facet)
-//        .addClass('tagcloud_size_' + parseInt(objectedItems[i].count / maxCount * 10))
-        .click(this.clickHandler(facet))
-      );
+      var count = objectedItems[i].count;
+      if (facet != ''){
+        $(this.target).append(
+          $('<a href="#" class="tagcloud_item"></a>')
+            .text(facet + ' (' + count + ')')
+       //        .addClass('tagcloud_size_' + parseInt(objectedItems[i].count / maxCount * 10))
+            .click(this.clickHandler(facet))
+        );
+      }
     }
   }
 });
