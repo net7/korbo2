@@ -63,8 +63,7 @@
     <div class="clear"></div>
   </div>
 
-
-  <div data-ng-app="Pundit2">
+  <div data-ng-app="Pundit2" class="kee-wrp">
       <korbo-entity-editor conf-name="korboeeConfig"></korbo-entity-editor>
   </div>
 
