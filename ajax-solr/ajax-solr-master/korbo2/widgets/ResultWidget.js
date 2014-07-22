@@ -115,7 +115,7 @@ AjaxSolr.ResultWidget = AjaxSolr.AbstractWidget.extend({
     output += '<p id="links_' + doc.id + '" class="links"></p>';
     output += '<p>' + snippet + '</p>';
 
-    output += '<p><a href="javascript:$window[obj].callEdit('+doc.id+')">EDIT</a></p>  </div>';
+    output += '<p><a href="javascript:window[obj].callEdit('+doc.id+')">EDIT</a></p>  </div>';
 
       //baseurl ID  = ' + doc.id + ' BASKET = ' + doc.basked_id_s + '">
 

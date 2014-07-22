@@ -69,7 +69,7 @@
   </div>
 
 <script type="text/javascript">
-      var obj = $window['korboeeConfig'].globalObjectName;
+      var obj = window['korboeeConfig'].globalObjectName;
 </script>
 </body>
 </html>
