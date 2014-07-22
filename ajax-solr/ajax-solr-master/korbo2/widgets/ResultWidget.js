@@ -115,7 +115,9 @@ AjaxSolr.ResultWidget = AjaxSolr.AbstractWidget.extend({
     output += '<p id="links_' + doc.id + '" class="links"></p>';
     output += '<p>' + snippet + '</p>';
 
-    output += '<p><a href="javascript:window[obj].callEdit('+doc.id+')">EDIT</a></p>';
+
+    //output += '<p><a href="javascript:window[obj].callEdit('+doc.id+')">EDIT</a></p>';
+    output += '<p><a href="javascript:window[window[\'korboeeConfig\'].globalObjectName].callEdit('+doc.id+')">EDIT</a></p>';
 
     output +='</div>';
 
