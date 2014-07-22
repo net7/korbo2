@@ -23,7 +23,6 @@ define([
   'core/ParameterStore',
   'korbo2/ResultWidget',
   'korbo2/TagcloudWidget',
-//  'korbo2/CurrentSearchWidget.9',
   'korbo2/CurrentSearchWidget',
   'korbo2/AutocompleteWidget',
   'korbo2/CountryCodeWidget',

@@ -52,7 +52,6 @@ AjaxSolr.ResultWidget = AjaxSolr.AbstractWidget.extend({
       $(this.target).append(this.template(doc));
 
       var items = [];
-
 // questi vanno nei risultati
 //      items = items.concat(this.facetLinks('topics', doc.topics));
 //      items = items.concat(this.facetLinks('label_ss', doc.label_ss));
@@ -112,10 +111,13 @@ AjaxSolr.ResultWidget = AjaxSolr.AbstractWidget.extend({
 	  label = doc.label_ss;
         }
       }
-
     var output = '<div><h2>' + label + '</h2>';
     output += '<p id="links_' + doc.id + '" class="links"></p>';
-    output += '<p>' + snippet + '</p></div>';
+    output += '<p>' + snippet + '</p>';
+
+    output += '<p><a href="baseurl ID  = ' + doc.id + ' BASKET = ' + doc.basked_id_s + '">EDIT</a></p>  </div>';
+
+
     return output;
   },
 
