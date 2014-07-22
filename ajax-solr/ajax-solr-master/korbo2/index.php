@@ -68,7 +68,7 @@
       <korbo-entity-editor conf-name="korboeeConfig"></korbo-entity-editor>
   </div>
 
-<script>
+<script type="text/javascript">
       var obj = $window['korboeeConfig'].globalObjectName;
 </script>
 </body>
