@@ -96,9 +96,17 @@ class FreebaseSearchDriverTest extends WebTestCase
         $this->assertEquals(1, count($itemResponseContainer->getLabels()));
         $this->assertEquals(1, count($itemResponseContainer->getDescriptions()));
         $this->assertEquals($this->container->getParameter("freebase_image_search") . "/m/02mjmr", $itemResponseContainer->getDepiction());
+        $types = $itemResponseContainer->getTypes();
 
         // at least one type
-        $this->assertGreaterThan(1, count($itemResponseContainer->getTypes()));
+        $this->assertGreaterThan(1, count($types));
+
+       // Check if types has absolute url http://www.freebase.com/*
+
+      if (count($types)>0){
+          foreach ($types as $type) 
+           $this->assertEquals(1,preg_match('|http://www.freebase.com/|',$type));
+      }
     }
 
 

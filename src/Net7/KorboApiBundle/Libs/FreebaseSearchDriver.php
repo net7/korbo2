@@ -149,7 +149,13 @@ class FreebaseSearchDriver extends AbstractSearchDriver {
             $itemResponseContainer->setLabel($label['value'], str_replace('/lang/', '', $label['lang']));
         }
 
-        $itemResponseContainer->setTypes($jsonEntity['result']['type']);
+        $types = $jsonEntity['result']['type'];
+        $types_new = array();
+        if (count($types)>0) {
+           foreach ($types as $type)
+               $types_new[]='http://www.freebase.com'.$type;
+        }
+        $itemResponseContainer->setTypes($types_new);
 
         // STEP 2
         //$langs = $this->languagesToRetrieve;
