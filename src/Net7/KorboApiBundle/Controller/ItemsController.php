@@ -435,7 +435,15 @@ class ItemsController extends KorboI18NController
         $basket = $em->find("Net7KorboApiBundle:Basket", $request->get('basketId'));
 
         /** if the id parameter is present we modify an existing item...otherwise we will create a new one @var Item */
-        $item = ( ($id = $request->get("id", false) ) === false) ? new Item() : $em->find("Net7KorboApiBundle:Item", $id);
+        //$item = ( ($id = $request->get("id", false) ) === false) ? new Item() : $em->find("Net7KorboApiBundle:Item", $id);
+
+        if (($id=$request->get("id", false))===false) {
+           $item = new Item();
+        } 
+        else {
+           $item = $em->find("Net7KorboApiBundle:Item", $id);
+        }
+
 
         $item->setBasket($basket);
         //no resource to import passed as parameter
@@ -449,6 +457,11 @@ class ItemsController extends KorboI18NController
         } else {
             // TODO: la risorsa viene copiata a partire dalla url del provider nn vengono considerati i campi editati dal widget
             // new resource to import
+
+            // TODO: l'importer ora scatta SOLO se la risorsa è NEW altrimenti viene modificata direttamente URL
+
+            if ( $id === false ) {
+
             $itemImporter = new ItemExternalImport($resourceToImport, $item, $importResourceSynchronously, $this->container, $this->acceptLanguage);
 
             try{
@@ -459,6 +472,8 @@ class ItemsController extends KorboI18NController
                 $this->response->setContent(json_encode(array("error" => $e->getMessage())));
 
                 return $this->response;
+            }
+
             }
             $item->setResource($resourceToImport);
         }
