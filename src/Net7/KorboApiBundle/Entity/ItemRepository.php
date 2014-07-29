@@ -98,7 +98,7 @@ class ItemRepository extends EntityRepository{
 
         $select  = ($isCount) ? 'count(distinct it.object)' : 'i';
         $localeQueryPart = ($locale) ? "it.locale = '{$locale}' AND" : '';
-        $basketIdQueryPart = ($basketId) ? "i.basket_id= '{$basketId}' AND" : '';
+        $basketIdQueryPart = ($basketId) ? "IDENTITY(i.basket)= '{$basketId}' AND" : '';
         $groupBy = ($isCount) ? '' :  "GROUP BY i.id" ;
 
         $dql = <<<___SQL
