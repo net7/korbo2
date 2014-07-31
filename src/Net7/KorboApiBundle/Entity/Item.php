@@ -238,7 +238,8 @@ class Item
      */
     public function getBasketId()
     {
-        return $this->basket->getId();
+        if($this->basket) return $this->basket->getId();
+        return null;
     }
 
 
