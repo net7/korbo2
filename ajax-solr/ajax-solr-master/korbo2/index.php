@@ -12,7 +12,16 @@
     <link rel="stylesheet" href="http://dev.thepund.it/download/client/last-beta/pundit2.css" type="text/css">
     <script src="http://dev.thepund.it/download/client/last-beta/libs.js" type="text/javascript" ></script>
     <script src="http://dev.thepund.it/download/client/last-beta/pundit2.js" type="text/javascript" ></script>
-    <script src="http://dev.thepund.it/download/client/last-beta/korboee_conf.js" type="text/javascript" ></script>
+
+    <?php
+
+    if (isset($_GET['conf'])){
+        $conf = $_GET['conf'];
+    } else {
+        $conf = 'http://dev.thepund.it/download/client/last-beta/korboee_conf.js';
+    }
+    ?>
+    <script src="<?php echo $conf;?>" type="text/javascript" ></script>
 
 
   <link rel="stylesheet" href="css/reuters.css">
