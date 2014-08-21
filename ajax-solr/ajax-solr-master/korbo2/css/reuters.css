@@ -4,12 +4,17 @@
 } 
 
 body {
-  background: #fff url(../images/header.gif) repeat-x;
+  background: #fff;
   color: #333;
   font-family: Verdana, Arial, Helvetica, sans-serif;
   font-size: 12px;
   line-height: 18px;
 }
+
+body.head {
+    background: #fff url(../images/header.gif) repeat-x;
+}
+
 img {
   border: none;
 }

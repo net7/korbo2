@@ -32,12 +32,14 @@
 
 
 </head>
-<body>
-  <div id="wrap"> 
+<body<?php if(!isset($_GET['iframe']) || $_GET['iframe'] != 1): ?> class="head"<?php endif;?>>
+  <div id="wrap">
+      <?php if(!isset($_GET['iframe']) || $_GET['iframe'] != 1): ?>
     <div id="header">
       <h1>Korbo2EE - Editor</h1>
       <h2>Browse and edit data</h2>
     </div>
+      <?php endif;?>
 
     <div class="right">
       <div id="result">
