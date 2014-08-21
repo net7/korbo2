@@ -31,13 +31,19 @@ AjaxSolr.TagcloudWidget = AjaxSolr.AbstractFacetWidget.extend({
     });
 
     $(this.target).empty();
+
     for (var i = 0, l = objectedItems.length; i < l; i++) {
       var facet = objectedItems[i].facet;
       var count = objectedItems[i].count;
       if (facet != ''){
+
+        // note that this works even if there aren't any slashes in the string
+        var label = facet.substring(facet.lastIndexOf('/')+ 1);
+
         $(this.target).append(
           $('<a href="#" class="tagcloud_item"></a>')
-            .text(facet + ' (' + count + ')')
+//            .text(facet + ' (' + count + ')')
+            .text(label + ' (' + count + ')')
        //        .addClass('tagcloud_size_' + parseInt(objectedItems[i].count / maxCount * 10))
             .click(this.clickHandler(facet))
         );

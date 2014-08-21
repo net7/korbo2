@@ -19,7 +19,9 @@ AjaxSolr.CurrentSearchWidget = AjaxSolr.AbstractWidget.extend({
     var q = this.manager.store.get('q').val();
     if (q != '*:*') {
 
-        links.push($('<a href="#"></a>').text('(x) ' + q).click(function () {
+        var label = q.substring(q.lastIndexOf('/')+ 1);
+
+        links.push($('<a href="#"></a>').text('[x] ' + label).click(function () {
 //        self.manager.store.get('q').val('basket_id_s:'+basket_id);
         self.manager.store.get('q').val('*:*');
         self.doRequest();
@@ -31,7 +33,10 @@ AjaxSolr.CurrentSearchWidget = AjaxSolr.AbstractWidget.extend({
     for (var i = 0, l = fq.length; i < l; i++) {
         if (fq[i] != 'basket_id_s:' + basket_id){
 
-            links.push($('<a href="#"></a>').text('(x) ' + fq[i]).click(self.removeFacet(fq[i])));
+            // note that this works even if there aren't any slashes in the string
+            var label = fq[i].substring(0, fq[i].length -1).substring(fq[i].lastIndexOf('/')+ 1)
+//            links.push($('<a href="#"></a>').text('(x) ' + fq[i]).click(self.removeFacet(fq[i])));
+            links.push($('<a href="#"></a>').text('[x] ' + label).click(self.removeFacet(fq[i])));
         }
     }
 
