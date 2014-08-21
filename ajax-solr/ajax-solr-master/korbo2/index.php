@@ -35,8 +35,8 @@
 <body>
   <div id="wrap"> 
     <div id="header">
-      <h1>Korbo Search</h1>
-      <h2>Browse Burckhardt data</h2>
+      <h1>Korbo2EE - Editor</h1>
+      <h2>Browse and edit data</h2>
     </div>
 
     <div class="right">

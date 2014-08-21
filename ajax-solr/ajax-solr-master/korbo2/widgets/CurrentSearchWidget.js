@@ -36,7 +36,7 @@ AjaxSolr.CurrentSearchWidget = AjaxSolr.AbstractWidget.extend({
             // note that this works even if there aren't any slashes in the string
             var label = fq[i].substring(0, fq[i].length -1).substring(fq[i].lastIndexOf('/')+ 1)
 //            links.push($('<a href="#"></a>').text('(x) ' + fq[i]).click(self.removeFacet(fq[i])));
-            links.push($('<a href="#"></a>').text('[x] ' + label).click(self.removeFacet(fq[i])));
+            links.push($('<a href="#" title="'+fq[i].replace('"', ' ')+'"></a>').text('[x] ' + label).click(self.removeFacet(fq[i])));
         }
     }
 

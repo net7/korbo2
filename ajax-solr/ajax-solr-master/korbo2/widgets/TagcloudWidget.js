@@ -41,7 +41,7 @@ AjaxSolr.TagcloudWidget = AjaxSolr.AbstractFacetWidget.extend({
         var label = facet.substring(facet.lastIndexOf('/')+ 1);
 
         $(this.target).append(
-          $('<a href="#" class="tagcloud_item"></a>')
+          $('<a href="#" class="tagcloud_item" title="'+facet+'"></a>')
 //            .text(facet + ' (' + count + ')')
             .text(label + ' (' + count + ')')
        //        .addClass('tagcloud_size_' + parseInt(objectedItems[i].count / maxCount * 10))
