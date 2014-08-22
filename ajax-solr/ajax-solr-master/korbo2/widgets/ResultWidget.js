@@ -106,7 +106,6 @@ AjaxSolr.ResultWidget = AjaxSolr.AbstractWidget.extend({
         if (doc.label_ss.length > 1){
            label = doc.label_ss[0];
         } else {
-//	  label =  doc.label_ss + ' | ' + doc.id;
 	  label =  doc.label_ss ;
         }
       }
@@ -116,7 +115,7 @@ AjaxSolr.ResultWidget = AjaxSolr.AbstractWidget.extend({
 
 
     //output += '<p><a href="javascript:window[obj].callEdit('+doc.id+')">EDIT</a></p>';
-    output += '<p>'+doc.id+ ' | ' + '<a href="javascript:window[window[\'korboeeConfig\'].globalObjectName].callEdit('+doc.id+')">EDIT</a></p>';
+    output += '<p>ID: ' +doc.id+ ' | ' + '<a href="javascript:window[window[\'korboeeConfig\'].globalObjectName].callEdit('+doc.id+')">EDIT</a></p>';
 
     output +='</div>';
 
