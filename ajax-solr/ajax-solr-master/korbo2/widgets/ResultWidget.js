@@ -109,13 +109,16 @@ AjaxSolr.ResultWidget = AjaxSolr.AbstractWidget.extend({
 	  label =  doc.label_ss ;
         }
       }
-    var output = '<div><h2>' + label + '</h2>';
+    var output = '<div class="result_'+doc.id+'"><h2>' + label + '</h2>';
     output += '<p id="links_' + doc.id + '" class="links"></p>';
     output += '<p>' + snippet + '</p>';
 
 
     //output += '<p><a href="javascript:window[obj].callEdit('+doc.id+')">EDIT</a></p>';
-    output += '<p>ID: ' +doc.id+ ' | ' + '<a href="javascript:window[window[\'korboeeConfig\'].globalObjectName].callEdit('+doc.id+')">EDIT</a></p>';
+    output += '<p>' +
+        'ID: ' +doc.id+ ' | ' + '<a href="javascript:window[window[\'korboeeConfig\'].globalObjectName].callEdit('+doc.id+')">EDIT</a>' +
+        ' | <a href="#" onclick="delete_korbo_item('+doc.id +'); "> DELETE </a>'+
+        '</p>';
 
     output +='</div>';
 

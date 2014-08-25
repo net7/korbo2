@@ -80,6 +80,24 @@
 
 <script type="text/javascript">
       var obj = window['korboeeConfig'].globalObjectName;
+
+      function delete_korbo_item(id){
+          if (confirm('Are you sure you want to delete the item ?')){
+          $.ajax({
+             type: "DELETE",
+              url: "/v1/items/"+ id,
+             data: "name=someValue",
+          success: function(msg){
+                 alert("The Item was successfully deleted");
+                $('.result_' + id).fadeOut(1000);
+          },
+          error: function(textStatus, errorThrown) {
+              console.log(textStatus, errorThrown);
+              alert("Some problem arose while deleting the item!");
+          }
+
+          })};
+      }
 </script>
 </body>
 </html>

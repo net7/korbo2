@@ -689,6 +689,46 @@ class ItemsController extends KorboI18NController
      */
     public function deleteAction($slug)
     {
+
+        $em = $this->getDoctrine()->getManager();
+        $item = $em->find("Net7KorboApiBundle:Item", $slug);
+
+
+        if (!$item){
+            throw $this->createNotFoundException('No item found');
+        } else {
+        }
+
+        // TODO: make the SOLR deletion work!
+//        $this->get('solr.client.default')->removeDocument($item);
+
+
+        // AND REMOVE THIS S**T
+
+        $config = array(
+            'default' => array(
+                'host' => 'thepund.it',
+                'port' => 8080,
+//                'path' => '/dev2.korbo.solr',
+                'path' => '/korbo2-solr/',
+            )
+        );
+
+        $client = new \Solarium\Client(array('endpoint' => $config));
+        $update = $client->createUpdate();
+        $update->addDeleteQuery('id:' . $slug);
+        $update->addCommit();
+
+        $result = $client->update($update);
+
+       if ($result->getStatus() == 0) {
+          // the solr update query did work
+          // REMOVE up to here
+            $em->remove($item);
+            $em->flush();
+       }
+        return new Response('OK');
+
     } // "delete_item"   [DELETE] /items/{slug}
 
 
