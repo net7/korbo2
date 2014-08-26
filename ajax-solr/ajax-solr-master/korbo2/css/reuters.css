@@ -9,6 +9,8 @@ body {
   font-family: Verdana, Arial, Helvetica, sans-serif;
   font-size: 12px;
   line-height: 18px;
+  min-height: 100%;
+  position: relative;
 }
 
 body.head {
@@ -29,7 +31,7 @@ body.head {
     width: 200px;
     height: 200px;
     z-index: 11;
-    position: absolute;
+    position: fixed;
     left: 50%;
     top: 50%;
     margin-left: -100px; /* -1 * image width / 2 */
