@@ -33,6 +33,7 @@
 
 </head>
 <body<?php if(!isset($_GET['iframe']) || $_GET['iframe'] != 1): ?> class="head"<?php endif;?>>
+<div id="busy"><img src="images/loading.gif" class="ajax-loader"/></div>
   <div id="wrap">
       <?php if(!isset($_GET['iframe']) || $_GET['iframe'] != 1): ?>
     <div id="header">
@@ -83,18 +84,24 @@
 
       function delete_korbo_item(id){
           if (confirm('Are you sure you want to delete the item ?')){
-          $.ajax({
-             type: "DELETE",
-              url: "/v1/items/"+ id,
-             data: "name=someValue",
-          success: function(msg){
-                 alert("The Item was successfully deleted");
-                $('.result_' + id).fadeOut(1000);
-          },
-          error: function(textStatus, errorThrown) {
-              console.log(textStatus, errorThrown);
-              alert("Some problem arose while deleting the item!");
-          }
+
+              $('#busy').show();
+
+              $.ajax({
+                 type: "DELETE",
+                  url: "/v1/items/"+ id,
+                 data: "name=someValue",
+              success: function(msg){
+                     alert("The Item was successfully deleted");
+                    $('.result_' + id).fadeOut(1000);
+              },
+              error: function(textStatus, errorThrown) {
+                  console.log(textStatus, errorThrown);
+                  alert("Some problem arose while deleting the item!");
+              },
+              complete: function(){
+                  $('#busy').hide();
+              }
 
           })};
       }
