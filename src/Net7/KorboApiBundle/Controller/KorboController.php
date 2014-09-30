@@ -98,7 +98,7 @@ class KorboController extends Controller
             return (substr(key($langs), 0, 2));
         }
 
-        return $this->container->getParameter('openpal_default_locale');
+        return $this->container->getParameter('korbo_default_locale');
     }
 
     protected function checkAndSetField($fieldName, Request $request, $obj, $defaultValue = 'null')
