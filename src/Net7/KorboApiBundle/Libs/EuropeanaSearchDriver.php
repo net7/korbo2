@@ -75,18 +75,17 @@ class EuropeanaSearchDriver extends AbstractSearchDriver {
         foreach ($arrayResult['items'] as $result) {
 
             $id = str_replace("/", "__", $result['id']);
-            $metas = $this->getEntityMetadata("http://www.europeana.eu" . $result['id']);
 
             $results[] = array(
                 'available_languages' => array("mul"),
                 'id'                  => $id,
                 'uri'                 => '',
                 'basket_id'           => null,
-                'depiction'           => $metas['depiction'],
-                'abstract'            => $metas['abstract'],
-                'resource'            => $metas['resource'],
+                'depiction'           => (array_key_exists("edmPreview", $result)) ? $result['edmPreview'][0] : '',
+                'abstract'            => (array_key_exists("dcDescription", $result)) ? $result['dcDescription'][0] : '',
+                'resource'            => "http://www.europeana.eu/portal/record/" . $result['id'] . '.html',
                 'uri'                 => "http://www.europeana.eu" . $result['id'],
-                'label'               => $result['title'][0],
+                'label'               => (array_key_exists("title", $result)) ? $result['title'][0] : '',
                 'type'                => $result["type"]
             );
         }
@@ -217,7 +216,7 @@ class EuropeanaSearchDriver extends AbstractSearchDriver {
         $params = $this->extraParameters;
 
         $word = urlencode(str_replace('"', '', trim($word)));
-        $requestUrl = $this->europeanaBaseUrl . $this->europeanaApiKey . '&query=' . $word ;
+        $requestUrl = $this->europeanaBaseUrl . $this->europeanaApiKey . '&query=' . $word . '&profile=rich';
 
         $contentType = (isset($params['content-type'])) ? $params['content-type'] : 'text/html';
 
