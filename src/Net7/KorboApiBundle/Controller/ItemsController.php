@@ -575,6 +575,7 @@ class ItemsController extends KorboI18NController
 
             return $this->response;
         }
+
         $basketId = $request->get('basketId', false);
 
         $em = $this->getDoctrine()->getManager();
@@ -604,13 +605,13 @@ class ItemsController extends KorboI18NController
 
             $jsonItemsArray = array();
             foreach ($items as $item){
-                $item->setTranslatableLocale($this->acceptLanguage);
+                $item->setTranslatableLocale($locale);
+                //$item->setTranslatableLocale($this->acceptLanguage);
                 $item->setBaseItemUri($this->container->getParameter('korbo_base_purl_uri'));
                 $em->refresh($item);
 
                 $jsonItemsArray[] =  $serializer->serialize($item, 'json');
             }
-
 
             $paginator = new SearchPaginator($em, $baseApiPath, $locale, $queryString, $limit, $offset);
 
