@@ -86,7 +86,7 @@ class EuropeanaSearchDriver extends AbstractSearchDriver {
                 'resource'            => "http://www.europeana.eu/portal/record/" . $result['id'] . '.html',
                 'uri'                 => "http://www.europeana.eu" . $result['id'],
                 'label'               => (array_key_exists("title", $result)) ? $result['title'][0] : '',
-                'type'                => $result["type"]
+                'type'                => array($result["type"])
             );
         }
 //foreach ($arrayResult['items'] as $result) {
