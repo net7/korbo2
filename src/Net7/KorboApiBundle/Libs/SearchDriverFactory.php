@@ -39,6 +39,14 @@ class SearchDriverFactory {
                     $options
                 );
                 break;
+            case "europeana":
+                $instance = new EuropeanaSearchDriver(
+                    $container->getParameter('europeana_search_base_url'),
+                    $container->getParameter('europeana_api_key'),
+                    $baseApiPath,
+                    $options
+                );
+                break;
         }
 
         return $instance;
