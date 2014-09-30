@@ -70,13 +70,33 @@ class EuropeanaSearchDriver extends AbstractSearchDriver {
         $res = $this->doEuropeanaRequest($wordToSearch);
         $arrayResult = json_decode($res, true);
 
+        // TODO: uniform data returned
+
         foreach ($arrayResult['items'] as $result) {
+
+            $id = str_replace("/", "__", $result['id']);
+            $metas = $this->getEntityMetadata("http://www.europeana.eu" . $result['id']);
+
             $results[] = array(
-                'available_languages' => "",//array_keys($descriptions),
-                'id' => str_replace("/", "__", $result['id']),
-                'label' => $result['title'][0],
+                'available_languages' => array("mul"),
+                'id'                  => $id,
+                'uri'                 => '',
+                'basket_id'           => null,
+                'depiction'           => $metas['depiction'],
+                'abstract'            => $metas['abstract'],
+                'resource'            => $metas['resource'],
+                'uri'                 => "http://www.europeana.eu" . $result['id'],
+                'label'               => $result['title'][0],
+                'type'                => $result["type"]
             );
         }
+//foreach ($arrayResult['items'] as $result) {
+//            $results[] = array(
+//                'available_languages' => 'mul',
+//                'id'                  => str_replace("/", "__", $result['id']),
+//                'label'               => $result['title'][0],
+//            );
+//        }
 
         $this->europeanaSearchHits = array(
             "totalCount" => $arrayResult['totalResults'],
