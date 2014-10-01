@@ -108,7 +108,7 @@ class DandelionDbpediaSearchDriver extends AbstractSearchDriver {
      */
     public function getEntityMetadata($dandelionDbpediaEntityUrl)
     {
-        // checks if the url is valid
+        //TODO: is not possible to integrate it with korboEE
 
     }
 
