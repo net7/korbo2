@@ -85,7 +85,7 @@ class DandelionDbpediaSearchDriver extends AbstractSearchDriver {
                 'abstract'            => $result['abstract'],
                 'resource'            => $result['uri'],
                 'label'               => $result['title'],
-                'type'                => $result["types"]
+                'type'                => (!empty($result["types"])) ? $result["types"] : array("http://www.w3.org/2002/07/owl#Thing")
             );
         }
 
