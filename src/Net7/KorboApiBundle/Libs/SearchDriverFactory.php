@@ -47,6 +47,15 @@ class SearchDriverFactory {
                     $options
                 );
                 break;
+            case "dandeliondbpedia":
+                $instance = new DandelionDbpediaSearchDriver(
+                    $container->getParameter('dandelion_dbpedia_search_base_url'),
+                    $container->getParameter('dandelion_dbpedia_app_key'),
+                    $container->getParameter('dandelion_dbpedia_app_id'),
+                    $baseApiPath,
+                    $options
+                );
+                break;
         }
 
         return $instance;
