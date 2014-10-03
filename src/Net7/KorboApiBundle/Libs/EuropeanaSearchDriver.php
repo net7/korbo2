@@ -235,7 +235,7 @@ class EuropeanaSearchDriver extends AbstractSearchDriver {
         //limit
         $requestUrl .= (isset($params['limit'])) ? "&rows=" . $params['limit'] : '';
         $requestUrl .= (isset($params['offset'])) ? "&start=" . $params['offset'] : '';
-die ($requestUrl);
+
         $request = curl_init();
         curl_setopt($request, CURLOPT_URL, $requestUrl);
         curl_setopt($request, CURLOPT_HTTPHEADER, array("Content-Type: {$contentType}"));
