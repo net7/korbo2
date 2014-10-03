@@ -220,19 +220,22 @@ class EuropeanaSearchDriver extends AbstractSearchDriver {
         $parts = explode('|||', $word);
         if (count($parts) > 1) {
             $parts = explode('|||', $word);
-            $word = '*:*';
-            $qf = '&qf=' . urlencode('(' . $parts[0] . ' OR ' . $parts[1] . ')');
+            //$word = 'where:';
+            $word =  'where:(' . urlencode($parts[0] . ' OR ' . $parts[1] ) . ')';
+
+            //$qf = '&qf=' . urlencode('(' . $parts[0] . ' OR ' . $parts[1] . ')');
+        } else {
+            $word = urlencode(str_replace('"', '', trim($word)));
         }
 
-        $word = urlencode(str_replace('"', '', trim($word)));
-        $requestUrl = $this->europeanaBaseUrl . $this->europeanaApiKey . '&query=' . $word . $qf . '&profile=rich';
+        $requestUrl = $this->europeanaBaseUrl . $this->europeanaApiKey . '&query=' . $word . '&profile=rich';
 
         $contentType = (isset($params['content-type'])) ? $params['content-type'] : 'text/html';
 
         //limit
         $requestUrl .= (isset($params['limit'])) ? "&rows=" . $params['limit'] : '';
         $requestUrl .= (isset($params['offset'])) ? "&start=" . $params['offset'] : '';
-
+die ($requestUrl);
         $request = curl_init();
         curl_setopt($request, CURLOPT_URL, $requestUrl);
         curl_setopt($request, CURLOPT_HTTPHEADER, array("Content-Type: {$contentType}"));
