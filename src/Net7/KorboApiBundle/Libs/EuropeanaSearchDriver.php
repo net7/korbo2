@@ -215,8 +215,17 @@ class EuropeanaSearchDriver extends AbstractSearchDriver {
     protected function doEuropeanaRequest($word) {
         $params = $this->extraParameters;
 
+        // TODO -> REMOVE: patch for searching by location name
+        $qf = '';
+        $parts = explode('|||', $word);
+        if (count($parts) > 1) {
+            $parts = explode('|||', $word);
+            $word = '*:*';
+            $qf = '&qf=' . urlencode('(' . $parts[0] . ' OR ' . $parts[1] . ')');
+        }
+
         $word = urlencode(str_replace('"', '', trim($word)));
-        $requestUrl = $this->europeanaBaseUrl . $this->europeanaApiKey . '&query=' . $word . '&profile=rich';
+        $requestUrl = $this->europeanaBaseUrl . $this->europeanaApiKey . '&query=' . $word . $qf . '&profile=rich';
 
         $contentType = (isset($params['content-type'])) ? $params['content-type'] : 'text/html';
 
