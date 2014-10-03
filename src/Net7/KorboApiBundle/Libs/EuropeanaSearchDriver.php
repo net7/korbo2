@@ -190,7 +190,9 @@ class EuropeanaSearchDriver extends AbstractSearchDriver {
 
     public function getEntityDetails($europeanaEntityId)
     {
-        $europeanaUri = "http://www.europeana.eu/api/v2/record/" . $europeanaEntityId . ".json?wskey=" . $this->europeanaApiKey;
+        //$europeanaUri = "http://www.europeana.eu/api/v2/record/" . $europeanaEntityId . ".json?wskey=" . $this->europeanaApiKey;
+        $europeanaUri = "http://www.europeana.eu/portal/record/" . $europeanaEntityId . ".html";
+
         $entityMetadata = $this->getEntityMetadata($europeanaUri);
         $descriptions = $entityMetadata->getDescriptions();
         $labels = $entityMetadata->getLabels();
