@@ -54,7 +54,7 @@ class GeonamesSearchDriverTest extends WebTestCase
                                                    $extraParameters);
 
 
-        $this->assertEquals(2, count($searchDriver->search("52.11||14.1||paris")));
+        $this->assertEquals(5, count($searchDriver->search("52.11||14.1||paris")));
     }
 
 

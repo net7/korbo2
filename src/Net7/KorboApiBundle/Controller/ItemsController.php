@@ -462,17 +462,17 @@ class ItemsController extends KorboI18NController
 
             if ( $id === false ) {
 
-            $itemImporter = new ItemExternalImport($resourceToImport, $item, $importResourceSynchronously, $this->container, $this->acceptLanguage);
+                $itemImporter = new ItemExternalImport($resourceToImport, $item, $importResourceSynchronously, $this->container, $this->acceptLanguage);
 
-            try{
-                $itemImporter->importResource();
-            } catch (\Exception $e) {
-                // TODO improve error message
-                $this->response->setStatusCode(400);
-                $this->response->setContent(json_encode(array("error" => $e->getMessage())));
+                try{
+                    $itemImporter->importResource();
+                } catch (\Exception $e) {
+                    // TODO improve error message
+                    $this->response->setStatusCode(400);
+                    $this->response->setContent(json_encode(array("error" => $e->getMessage())));
 
-                return $this->response;
-            }
+                    return $this->response;
+                }
 
             }
             $item->setResource($resourceToImport);
@@ -560,6 +560,14 @@ class ItemsController extends KorboI18NController
      *                  required="false",
      *                  format="string",
      *                  type="string"
+     *              ),
+     *            @SWG\Parameter(
+     *                  name="updatedAfter",
+     *                  description="Filters results updated after the date passed as parameter",
+     *                  paramType="query",
+     *                  required="false",
+     *                  format="datetime",
+     *                  type="string"
      *              )
      *          )
      *     )
@@ -584,6 +592,8 @@ class ItemsController extends KorboI18NController
         // if no limit is passed set default page size
         $limit  = $request->get('limit', $this->container->getParameter('korbo_api_default_page_size'));
 
+        $updatedAfter = $request->get('updatedAfter', false);
+
         $queryString = $request->get('q', false);
         $locale = $request->get("lang", $this->container->getParameter('korbo_default_locale'));
 
@@ -599,7 +609,7 @@ class ItemsController extends KorboI18NController
             $metadata = $driver->getPaginationMetadata($baseApiPath);
             $jsonContent = '{"data":' . json_encode($jsonItemsArray, JSON_UNESCAPED_SLASHES) . ', "metadata":' . json_encode($metadata, JSON_UNESCAPED_SLASHES) . '}';
         } else {
-            $items = $em->getRepository('Net7KorboApiBundle:Item')->findByLocaleAndQueryString($locale, $queryString, $limit, $offset, $basketId);
+            $items = $em->getRepository('Net7KorboApiBundle:Item')->findByLocaleAndQueryString($locale, $queryString, $limit, $offset, $basketId, $updatedAfter);
 
             $serializer  = $this->container->get('serializer');
 
@@ -613,7 +623,7 @@ class ItemsController extends KorboI18NController
                 $jsonItemsArray[] =  $serializer->serialize($item, 'json');
             }
 
-            $paginator = new SearchPaginator($em, $baseApiPath, $locale, $queryString, $limit, $offset);
+            $paginator = new SearchPaginator($em, $baseApiPath, $locale, $queryString, $limit, $offset, $updatedAfter);
 
             $metadata = $paginator->getPaginationMetadata();
             $jsonContent = '{"data":[' . implode(',', $jsonItemsArray) . '], "metadata":' . json_encode($metadata, JSON_UNESCAPED_SLASHES) . '}';

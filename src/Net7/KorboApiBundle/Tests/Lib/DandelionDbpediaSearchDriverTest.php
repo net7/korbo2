@@ -60,7 +60,7 @@ class DandelionDbpediaSearchDriverTest extends WebTestCase
         $searchDriver->setDefaultLanguage('en');
 
         $r = $searchDriver->search("bush");
-        print_r($r);die;
+        //print_r($r);die;
 
         $this->assertEquals(2, count($searchDriver->search("bush")));
     }

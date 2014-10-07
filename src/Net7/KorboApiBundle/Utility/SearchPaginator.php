@@ -22,6 +22,7 @@ class SearchPaginator extends Paginator {
     private $em;
     private $queryString;
     private $basketId;
+    private $updatedAfter;
 
     /**
      * Default construcutor
@@ -32,9 +33,10 @@ class SearchPaginator extends Paginator {
      * @param $queryString
      * @param int $limit
      * @param int $offset
-     * @param int $basketId
+     * @param bool $basketId
+     * @param bool $updatedAfter
      */
-    public function __construct($em, $baseApiPath, $locale, $queryString, $limit = 0, $offset = 0, $basketId = false)
+    public function __construct($em, $baseApiPath, $locale, $queryString, $limit = 0, $offset = 0, $basketId = false, $updatedAfter = false)
     {
         $this->setBaseApiPath($baseApiPath);
         $this->setOffset($offset);
@@ -42,7 +44,8 @@ class SearchPaginator extends Paginator {
         $this->em = $em;
         $this->queryString = $queryString;
         $this->basketId = $basketId;
-        $baseQuery = ItemRepository::getSearchItemsCountQuery($em, $locale, $queryString, $basketId);
+        $this->updatedAfter = $updatedAfter;
+        $baseQuery = ItemRepository::getSearchItemsCountQuery($em, $locale, $queryString, $basketId, $updatedAfter);
 
         $this->setBaseQuery($baseQuery);
     }
@@ -51,7 +54,7 @@ class SearchPaginator extends Paginator {
     {
         $metadata = parent::getPaginationMetadata();
 
-        $allLanguagesCount = ItemRepository::getSearchItemsCountQuery($this->em, false, $this->queryString, $this->basketId)->getSingleScalarResult();
+        $allLanguagesCount = ItemRepository::getSearchItemsCountQuery($this->em, false, $this->queryString, $this->basketId, $this->updatedAfter)->getSingleScalarResult();
 
         $metadata['allLanguagesCount'] = $allLanguagesCount;
 

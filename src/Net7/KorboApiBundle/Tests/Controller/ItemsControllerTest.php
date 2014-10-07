@@ -150,6 +150,10 @@ class ItemsControllerTest extends WebTestCase
 
     }
 
+
+    /**
+     * @group new
+     */
     public function testSavedItem()
     {
         $client = static::createClient();
@@ -163,6 +167,7 @@ class ItemsControllerTest extends WebTestCase
         $item = $this->em->getRepository("Net7KorboApiBundle:Item")->find($itemId);
 
         $this->assertEquals($this->basketId, $item->getBasket()->getId());
+
     }
 
     public function testPostStatusCodeAndHeader()

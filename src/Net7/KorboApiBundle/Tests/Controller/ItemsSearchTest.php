@@ -4,6 +4,7 @@ namespace Net7\KorboApiBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Net7\KorboApiBundle\Entity\Basket;
+use Symfony\Component\Validator\Constraints\DateTime;
 
 class ItemsSearchTest extends WebTestCase
 {
@@ -178,6 +179,9 @@ class ItemsSearchTest extends WebTestCase
         $this->assertEquals(3, $items['metadata']['pageCount']);
     }
 
+    /**
+     * @group fail
+     */
     public function testLinksEven()
     {
 
@@ -205,6 +209,7 @@ class ItemsSearchTest extends WebTestCase
 
         // requesting second page
         $items = $this->getItems("this",4, 4);
+
         $links = $this->processRels($items['metadata']['links']);
 
         // checking limit
@@ -365,6 +370,27 @@ class ItemsSearchTest extends WebTestCase
 
     }
 
+    /**
+     * @group updated-after
+     */
+    public function testSearchUpdatedAfter() {
+        $client = static::createClient();
+        $dateTime = new \DateTime();
+
+        $postedItemLocation = $this->loadItems(11);
+
+        $items = $this->getItems("this", 5, 0, 'en', '2014-01-01');
+
+        $this->assertEquals(5, count($items['data']));
+
+        $items = $this->getItems("this", 5, 0, 'en', $dateTime->format('Y') + 1 . '-01-01');
+        $this->assertEquals(0, count($items['data']));
+
+        $items = $this->getItems("this", 5);
+        $this->assertEquals(5, count($items['data']));
+    }
+
+
     private function processRels($rels){
 
         $returnArray = array();
@@ -375,7 +401,7 @@ class ItemsSearchTest extends WebTestCase
         return $returnArray;
     }
 
-    private function getItems($query, $limit, $offset = 0, $lang = 'en'){
+    private function getItems($query, $limit, $offset = 0, $lang = 'en', $updatedAfter = false){
         $client = static::createClient();
 
         $params = array(
@@ -389,6 +415,10 @@ class ItemsSearchTest extends WebTestCase
 
         if ($lang !== false) {
             $params['lang'] = $lang;
+        }
+
+        if ($updatedAfter !== false) {
+            $params['updatedAfter'] = $updatedAfter;
         }
 
         if ($offset > 0) $params['offset'] = $offset;

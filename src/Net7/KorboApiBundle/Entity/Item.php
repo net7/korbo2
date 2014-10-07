@@ -143,6 +143,22 @@ class Item
     private $baseItemUri;
 
     /**
+     * @ORM\Column(name="created_at", type="datetime")
+     * @Gedmo\Timestampable(on="create")
+     *
+     */
+    private $createdAt;
+
+
+
+    /**
+     * @ORM\Column(name="updated_at", type="datetime")
+     * @Gedmo\Timestampable(on="update")
+     */
+    private $updatedAt;
+
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -287,6 +303,11 @@ class Item
         }
         $t->setObject($this);
 
+        // Updating object createdAt and updatedAt
+        $d = new \DateTime();
+
+        $this->setCreatedAt($d);
+        $this->setUpdatedAt($d);
     }
 
 
@@ -535,5 +556,37 @@ class Item
     }
 
 
+    /**
+     * @param $createdAt
+     */
+    public function setCreatedAt($createdAt)
+    {
+        $this->createdAt = $createdAt;
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * @param $updatedAt
+     */
+    public function setUpdatedAt($updatedAt)
+    {
+        $this->updatedAt = $updatedAt;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
+    }
 
 }

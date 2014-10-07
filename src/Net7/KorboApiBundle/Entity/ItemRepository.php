@@ -66,9 +66,9 @@ class ItemRepository extends EntityRepository{
      *
      * @return array
      */
-    public function findByLocaleAndQueryString($locale, $queryString, $limit = false, $offset = false, $basketId = false)
+    public function findByLocaleAndQueryString($locale, $queryString, $limit = false, $offset = false, $basketId = false, $updatedAfter  = false)
     {
-        $query = $this->getItemsByLocaleAndQueryStringQuery($queryString, $locale, false, $basketId);
+        $query = $this->getItemsByLocaleAndQueryStringQuery($queryString, $locale, false, $basketId, $updatedAfter);
 
         if ($limit !== false) {
             $query->setMaxResults($limit);
@@ -93,13 +93,15 @@ class ItemRepository extends EntityRepository{
      *
      * @return \Doctrine\ORM\Query
      */
-    private function getItemsByLocaleAndQueryStringQuery($queryString, $locale = false, $isCount = false, $basketId = false)
+    private function getItemsByLocaleAndQueryStringQuery($queryString, $locale = false, $isCount = false, $basketId = false, $updatedAfter = false)
     {
 
         $select  = ($isCount) ? 'count(distinct it.object)' : 'i';
         $localeQueryPart = ($locale) ? "it.locale = '{$locale}' AND" : '';
         $basketIdQueryPart = ($basketId) ? "IDENTITY(i.basket)= '{$basketId}' AND" : '';
         $groupBy = ($isCount) ? '' :  "GROUP BY i.id" ;
+        $updatedAfterQueryPart = ($updatedAfter) ? "i.updatedAt > '{$updatedAfter}' AND" : '';
+        //$updatedAfterQueryPart = ($updatedAfter) ? "i.updatedAt = 1" : '';
 
         $dql = <<<___SQL
               SELECT {$select}
@@ -108,12 +110,15 @@ class ItemRepository extends EntityRepository{
               WHERE
                 {$basketIdQueryPart}
                 {$localeQueryPart}
+                {$updatedAfterQueryPart}
                 ((it.field = 'label' AND it.content like '%{$queryString}%') OR
                 (it.field = 'abstract' AND it.content like '%{$queryString}%'))
               {$groupBy}
 ___SQL;
 
         $query = $this->getEntityManager()->createQuery($dql);
+        //die("asdfasd" . $query->getSQL());
+        //print_r($query->g);die;
 
         $query->setHint(
             \Doctrine\ORM\Query::HINT_CUSTOM_OUTPUT_WALKER,
@@ -130,11 +135,11 @@ ___SQL;
         return $query;
     }
 
-    public static function getSearchItemsCountQuery($em, $locale, $queryString, $basketId = false)
+    public static function getSearchItemsCountQuery($em, $locale, $queryString, $basketId = false, $updateAfter = false)
     {
         $i = new ItemRepository($em, new ClassMetadata( 'Net7KorboApiBundle:Item'));
 
-        return $i->getItemsByLocaleAndQueryStringQuery($queryString, $locale, true, $basketId);
+        return $i->getItemsByLocaleAndQueryStringQuery($queryString, $locale, true, $basketId, $updateAfter);
     }
 
 

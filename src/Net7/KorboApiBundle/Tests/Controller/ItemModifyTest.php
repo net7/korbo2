@@ -98,8 +98,56 @@ class LetterModifyTest extends WebTestCase
     // TODO: test inserimento e modifica con custom language Accept-Language
 
 
+
+
+    /**
+     * @group updated-after
+     */
+    public function testUpdatedAt() {
+        $postedLetterLocation = $this->loadItems(1);
+
+        $client = static::createClient();
+
+        $crawler = $client->request('POST',
+            $this->itemsUrl,
+            array(
+                "id"      => 1,
+                "asbstract" => self::$_TEST_CONTENT,
+                "label"   => "test-label-en"
+            ),
+            array(),
+            array(
+                'HTTP_CONTENT_LANGUAGE'  => 'en',
+            )
+        );
+
+        $item = $this->em->getRepository('Net7KorboApiBundle:Item')->find(1);
+
+        $this->assertEquals($item->getCreatedAt(), $item->getUpdatedAt());
+
+        $prevUpdatedAt =  $item->getUpdatedAt();
+
+        sleep(1);
+        // checking if updated at is changed after a modification
+        $this->postTranslationForField($client, 'type',  array("http://sample.com/type/1", "http://sample.com/type/2"));
+
+        $this->em->refresh($item);
+
+        $this->assertNotEquals($item->getCreatedAt(), $item->getUpdatedAt());
+
+        sleep(1);
+        $this->postTranslationForField($client, 'label', 'test-label-de', 1, 'de');
+
+        $item = $this->em->getRepository('Net7KorboApiBundle:Item')->find(1);
+        $this->assertNotEquals($prevUpdatedAt, $item->getUpdatedAt());
+
+    }
+
+
     /**
      * Modify
+     *
+     * @group new
      */
     public function testModifyItemI18n(){
         $itemUrl = $this->loadItems(1);
