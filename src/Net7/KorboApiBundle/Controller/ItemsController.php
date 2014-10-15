@@ -698,11 +698,11 @@ class ItemsController extends KorboI18NController
      *
      * @param string $slug
      */
-    public function deleteAction($slug)
+    public function deleteAction($id)
     {
 
         $em = $this->getDoctrine()->getManager();
-        $item = $em->find("Net7KorboApiBundle:Item", $slug);
+        $item = $em->find("Net7KorboApiBundle:Item", $id);
 
 
         if (!$item){
@@ -727,7 +727,7 @@ class ItemsController extends KorboI18NController
 
         $client = new \Solarium\Client(array('endpoint' => $config));
         $update = $client->createUpdate();
-        $update->addDeleteQuery('id:' . $slug);
+        $update->addDeleteQuery('id:' . $id);
         $update->addCommit();
 
         $result = $client->update($update);
