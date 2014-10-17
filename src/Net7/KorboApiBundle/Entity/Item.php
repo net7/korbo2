@@ -219,7 +219,7 @@ class Item
     public function getResourceIfPresent()
     {
         if ($this->resource) {
-            return $this->resource;
+            return str_replace('"', '', $this->resource);
         }
 
         return $this->getUri();
@@ -304,9 +304,9 @@ class Item
         $t->setObject($this);
 
         // Updating object createdAt and updatedAt
-        $d = new \DateTime();
+        //$d = new \DateTime();
 
-        $this->setUpdatedAt($d);
+        //$this->setUpdatedAt($d);
     }
 
 
