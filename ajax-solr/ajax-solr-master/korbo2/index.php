@@ -89,7 +89,7 @@
 
               $.ajax({
                  type: "DELETE",
-                  url: "/v1/items/"+ id,
+                  url: "/v1/baskets/null/items/"+ id,
                  data: "name=someValue",
               success: function(msg){
                      alert("The Item was successfully deleted");
