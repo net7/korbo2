@@ -74,6 +74,11 @@ net7_korbo_api_item_search:
   requirements:
     _method: GET
 
+net7_korbo_api_item_delete:
+  pattern:  /v1/baskets/{basketId}/items/{id}
+  defaults: { _controller: Net7KorboApiBundle:Items:delete}
+  requirements:
+    _method: DELETE
 
 #
 #
