@@ -18,6 +18,8 @@ use Net7\KorboApiBundle\Entity\Item;
 use Net7\KorboApiBundle\Entity\ItemRepository;
 use Net7\KorboApiBundle\Libs\ItemExternalImport;
 use Net7\KorboApiBundle\Utility\ItemsPaginator;
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\HttpFoundation\Request,
     Symfony\Component\HttpFoundation\Response,
     Symfony\Component\HttpFoundation\AcceptHeader,
@@ -32,6 +34,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Swagger\Annotations as SWG;
 use Symfony\Component\Security\Acl\Exception\Exception;
+use Symfony\Component\Yaml\Parser;
 
 /**
  * Baskets Api Controller
@@ -427,8 +430,9 @@ class ItemsController extends KorboI18NController
             return $this->response;
         }
 
-        $resourceToImport            = $request->get("resourceUrl", false);
+        $hasResourceToImport         = $request->get("importResource", false);
         $importResourceSynchronously = $request->get("sync", true);
+        $resourceToImport            = $request->get("resource", false);
 
         $em = $this->getDoctrine()->getManager();
 
@@ -446,14 +450,16 @@ class ItemsController extends KorboI18NController
 
 
         $item->setBasket($basket);
+
         //no resource to import passed as parameter
-        if ($resourceToImport === false) {
+        if ($hasResourceToImport === false) {
             $this->checkAndSetTranslation($item, 'label', $request);
             $this->checkAndSetTranslation($item, 'abstract', $request);
 
-            // at the beginning the depiction is an url
             $this->checkAndSetField('depiction', $request, $item);
             $this->checkAndSetField('type', $request, $item, array());
+            $this->checkAndSetField('resource', $request, $item, array());
+
         } else {
             // TODO: la risorsa viene copiata a partire dalla url del provider nn vengono considerati i campi editati dal widget
             // new resource to import
@@ -698,11 +704,13 @@ class ItemsController extends KorboI18NController
      *
      * @param string $slug
      */
-    public function deleteAction($slug)
+    public function deleteAction($id)
     {
+        $yaml = new Parser();
+        $confValues = $yaml->parse(file_get_contents(__DIR__.'/../../../../app/config/config.yml'));
 
         $em = $this->getDoctrine()->getManager();
-        $item = $em->find("Net7KorboApiBundle:Item", $slug);
+        $item = $em->find("Net7KorboApiBundle:Item", $id);
 
 
         if (!$item){
@@ -718,16 +726,15 @@ class ItemsController extends KorboI18NController
 
         $config = array(
             'default' => array(
-                'host' => 'thepund.it',
-                'port' => 8080,
-//                'path' => '/dev2.korbo.solr',
-                'path' => '/korbo2-solr/',
+                'host' => $confValues['fs_solr']['endpoints']['default']['host'],
+                'port' => $confValues['fs_solr']['endpoints']['default']['port'],
+                'path' => $confValues['fs_solr']['endpoints']['default']['path'],
             )
         );
 
         $client = new \Solarium\Client(array('endpoint' => $config));
         $update = $client->createUpdate();
-        $update->addDeleteQuery('id:' . $slug);
+        $update->addDeleteQuery('id:' . $id);
         $update->addCommit();
 
         $result = $client->update($update);

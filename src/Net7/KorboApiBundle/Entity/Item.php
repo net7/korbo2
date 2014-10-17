@@ -306,7 +306,6 @@ class Item
         // Updating object createdAt and updatedAt
         $d = new \DateTime();
 
-        $this->setCreatedAt($d);
         $this->setUpdatedAt($d);
     }
 
@@ -320,8 +319,7 @@ class Item
      */
     public function containsTranslation(ItemTranslation $translation)
     {
-        for ($i = 0; $i < $this->translations->count(); $i++) {
-            $t = $this->translations[$i];
+        foreach ($this->translations as $i => $t) {
             if ($t->getLocale() == $translation->getLocale() && $t->getField() == $translation->getField()) {
                 return $i;
             }
