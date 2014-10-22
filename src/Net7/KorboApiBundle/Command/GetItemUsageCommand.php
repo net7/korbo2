@@ -94,7 +94,7 @@ class GetItemUsageCommand extends ContainerAwareCommand
         }
 
         foreach ($annotations as $annotation) {
-            $output->writeln($annotation['s'] . '  --  ' . $annotation['p'] . '  --  ' . $this->itemToDelete->getLabelTranslated() . "\n");
+            $output->writeln($annotation['s'] . '  --  ' . $annotation['p'] . '  --  ' . $this->itemToDelete->getLabelTranslated() . '  --  ' . $annotation['page-context'] . "\n");
         }
 
 
@@ -153,9 +153,11 @@ EOT;
                 }
             }
 
+            //print_r($annotationMetadata);die;
             $annotations[] = array("s" => $subject, 'p' => $predicate,
                                    'xpointer' => $annotationXpointer, 'context' => $annotation['c']['value'],
-                                   'predicateUri' => $predicateKey, 'annotationId' => $annotationId);
+                                   'predicateUri' => $predicateKey, 'annotationId' => $annotationId,
+                                   'page-context' => $annotationMetadata['metadata']["http://purl.org/pundit/as/annotation/" . $annotationId]['http://purl.org/pundit/ont/ao#hasPageContext'][0]['value']);
 
 
         }
