@@ -163,8 +163,10 @@ class MergeItemsCommand extends ContainerAwareCommand
         $response1 = $this->doPostApiRequest($this->asSesameBaseApiUrl . "/openrdf-workbench/repositories/pundit/update",  http_build_query(array('update' => $query, 'queryLn' => "SPARQL")));
         $response2 = $this->doPostApiRequest($this->asSesameBaseApiUrl . "/openrdf-workbench/repositories/pundit/update",  http_build_query(array('update' => $queryInsert, 'queryLn' => "SPARQL")));
 
-            return !($response1 === false || $response2 === false);
-
+            //return !($response1 === false || $response2 === false);
+            if ($response1 === false || $response2 === false) {
+                return false;
+            }
         }
 
         return true;
