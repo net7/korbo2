@@ -152,7 +152,7 @@ class MergeItemsCommand extends ContainerAwareCommand
 
 
         //$queryInsert = 'WITH <http://purl.org/pundit/demo-cloud-server/graph/itemsGraph-' . $annotation["annotationId"] . '> ' .
-        $queryInsert = 'WITH <http://purl.org/pundit/as/graph//itemsGraph-' . $annotation["annotationId"] . '> ' .
+        $queryInsert = 'WITH <http://purl.org/pundit/as/graph/itemsGraph-' . $annotation["annotationId"] . '> ' .
             'DELETE { <' . $this->itemToDelete->getUri() . '> ?p ?o } ' .
             'INSERT { <' . $this->itemToMerge->getUri() . '>  <http://www.w3.org/2000/01/rdf-schema#label> "' . $this->itemToMerge->getLabelTranslated() .  '" . ' .
             '<' . $this->itemToMerge->getUri() .  '>  <http://www.w3.org/2004/02/skos/core#label> "' . $this->itemToMerge->getLabelTranslated() . '" . ' .
