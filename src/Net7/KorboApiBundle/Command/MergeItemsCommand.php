@@ -142,14 +142,17 @@ class MergeItemsCommand extends ContainerAwareCommand
         $itemsTypesForQuery = implode(' . ', $itemsTypesForQuery);
 
         foreach ($annotations as $annotation) {
-            $query = "WITH <http://purl.org/pundit/demo-cloud-server/graph/annotationGraph-{$annotation['annotationId']}> " .
+            // TODO: remove...insert in configuration
+            //$query = "WITH <http://purl.org/pundit/demo-cloud-server/graph/annotationGraph-{$annotation['annotationId']}> " .
+            $query = "WITH <http://purl.org/pundit/as/graph/annotationGraph-{$annotation['annotationId']}> " .
                      "DELETE { ?s ?p <{$this->itemToDelete->getUri()}> } " .
                      "INSERT { ?s ?p <{$this->itemToMerge->getUri()}> } " .
                      "WHERE{ ?s ?p <{$this->itemToDelete->getUri()}> }" ;
 
 
 
-        $queryInsert = 'WITH <http://purl.org/pundit/demo-cloud-server/graph/itemsGraph-' . $annotation["annotationId"] . '> ' .
+        //$queryInsert = 'WITH <http://purl.org/pundit/demo-cloud-server/graph/itemsGraph-' . $annotation["annotationId"] . '> ' .
+        $queryInsert = 'WITH <http://purl.org/pundit/as/graph//itemsGraph-' . $annotation["annotationId"] . '> ' .
             'DELETE { <' . $this->itemToDelete->getUri() . '> ?p ?o } ' .
             'INSERT { <' . $this->itemToMerge->getUri() . '>  <http://www.w3.org/2000/01/rdf-schema#label> "' . $this->itemToMerge->getLabelTranslated() .  '" . ' .
             '<' . $this->itemToMerge->getUri() .  '>  <http://www.w3.org/2004/02/skos/core#label> "' . $this->itemToMerge->getLabelTranslated() . '" . ' .
