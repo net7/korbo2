@@ -160,11 +160,14 @@ class MergeItemsCommand extends ContainerAwareCommand
             'WHERE{ <' . $this->itemToDelete->getUri() . '> ?p ?o }' ;
 
 
-        $response1 = $this->doPostApiRequest($this->asSesameBaseApiUrl . "/openrdf-workbench/repositories/pundit/update",  http_build_query(array('update' => $query, 'queryLn' => "SPARQL")));
-        $response2 = $this->doPostApiRequest($this->asSesameBaseApiUrl . "/openrdf-workbench/repositories/pundit/update",  http_build_query(array('update' => $queryInsert, 'queryLn' => "SPARQL")));
+            $response1 = $this->doPostApiRequest($this->asSesameBaseApiUrl . "/openrdf-workbench/repositories/pundit/update",  http_build_query(array('update' => $query, 'queryLn' => "SPARQL")));
 
-            //return !($response1 === false || $response2 === false);
-            if ($response1 === false || $response2 === false) {
+            if ($response1 === false) {
+                return false;
+            }
+            $response2 = $this->doPostApiRequest($this->asSesameBaseApiUrl . "/openrdf-workbench/repositories/pundit/update",  http_build_query(array('update' => $queryInsert, 'queryLn' => "SPARQL")));
+
+            if ($response2 === false) {
                 return false;
             }
         }
