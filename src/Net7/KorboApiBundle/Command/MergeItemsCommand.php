@@ -200,7 +200,7 @@ class MergeItemsCommand extends ContainerAwareCommand
 
         $query = <<<EOT
 select ?s ?p ?o ?c
-here {
+where {
 GRAPH ?c {
 ?s ?p <{$uri}>
 }
@@ -211,6 +211,7 @@ EOT;
         //$baseUrl = "http://demo-cloud.as.thepund.it:8080";
 
         $annotationList = json_decode($this->doApiRequest($this->asSesameBaseApiUrl . "/openrdf-sesame/repositories/pundit?query=" . urlencode($query) . '&queryLn=SPARQL'), true);
+        //echo $this->asSesameBaseApiUrl . "/openrdf-sesame/repositories/pundit?query=" . urlencode($query) . '&queryLn=SPARQL';die;
         if ($annotationList == '') return array();
 
         foreach ($annotationList['results']['bindings'] as $annotation) {
@@ -230,7 +231,7 @@ EOT;
 
             $subject = '';
             $predicate = '';
-            $predicateUri = '';
+
             foreach ($annotationMetadata['items'] as $key => $element) {
                 if (strpos($key, "xpointer") !== false) {
                     $subject = $element['http://purl.org/dc/elements/1.1/description'][0]['value'];
@@ -241,16 +242,20 @@ EOT;
                 }
             }
 
+            //print_r($annotationMetadata);die;
             $annotations[] = array("s" => $subject, 'p' => $predicate,
-                                   'xpointer' => $annotationXpointer, 'context' => $annotation['c']['value'],
-                                   'predicateUri' => $predicateKey, 'annotationId' => $annotationId);
+                'xpointer' => $annotationXpointer, 'context' => $annotation['c']['value'],
+                'predicateUri' => $predicateKey, 'annotationId' => $annotationId,
+                'page-context' => $annotationMetadata['metadata']["http://purl.org/pundit/as/annotation/" . $annotationId]['http://purl.org/pundit/ont/ao#hasPageContext'][0]['value']);
+
 
         }
 
         return $annotations;
     }
 
-     private function doApiRequest($url, $returnBooleanWhenErrorOccurs = false) {
+
+    private function doApiRequest($url, $returnBooleanWhenErrorOccurs = false) {
         $contentType = 'application/json';
 
         $request = curl_init();
