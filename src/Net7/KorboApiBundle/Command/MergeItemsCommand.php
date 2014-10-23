@@ -116,7 +116,7 @@ class MergeItemsCommand extends ContainerAwareCommand
 
         // updating the annotations
         $output->writeln("Updating the annotations... \n");
-        $updateAnnotationResponse = $this->updateAnnotations($annotations);
+        $updateAnnotationResponse = $this->updateAnnotations($annotations, $output);
         if ($updateAnnotationResponse === false) {
             throw new Exception('Something went wrong...AS API not reachable or got error');
         }
@@ -132,7 +132,7 @@ class MergeItemsCommand extends ContainerAwareCommand
     }
 
 
-    private function updateAnnotations($annotations) {
+    private function updateAnnotations($annotations, $output) {
         //$baseUrl = "http://demo-cloud.as.thepund.it:8080";
 
         $itemsTypesForQuery = array();
@@ -162,6 +162,7 @@ class MergeItemsCommand extends ContainerAwareCommand
             '} ' .
             'WHERE{ <' . $this->itemToDelete->getUri() . '> ?p ?o }' ;
 
+            $output->writeln("\nQUERY INSERT:" . $queryInsert . "\n\n\n");
 
             $response1 = $this->doPostApiRequest($this->asSesameBaseApiUrl . "/openrdf-workbench/repositories/pundit/update",  http_build_query(array('update' => $query, 'queryLn' => "SPARQL")));
 
