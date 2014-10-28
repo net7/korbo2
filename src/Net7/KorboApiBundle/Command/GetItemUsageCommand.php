@@ -94,7 +94,7 @@ class GetItemUsageCommand extends ContainerAwareCommand
         }
 
         foreach ($annotations as $annotation) {
-            $output->writeln($annotation['s'] . '  --  ' . $annotation['p'] . '  --  ' . $this->itemToDelete->getLabelTranslated() . '  --  ' . $annotation['page-context'] . "\n");
+            $output->writeln($annotation['annotationId'] . ' ' . $annotation['s'] . '  --  ' . $annotation['p'] . '  --  ' . $this->itemToDelete->getLabelTranslated() . '  --  ' . $annotation['page-context'] . "\n");
         }
 
 

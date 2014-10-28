@@ -90,7 +90,7 @@ class SyncWithASCommand extends ContainerAwareCommand
             }
 
             foreach ($annotations as $annotation) {
-                $output->writeln($annotation['s'] . '  --  ' . $annotation['p'] . '  --  ' . $item->getLabelTranslated() . "\n");
+                $output->writeln($annotation['annotationId'] . ' ' .$annotation['s'] . '  --  ' . $annotation['p'] . '  --  ' . $item->getLabelTranslated() . "\n");
             }
 
             // updating the annotations
