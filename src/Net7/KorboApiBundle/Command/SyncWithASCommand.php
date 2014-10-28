@@ -101,7 +101,7 @@ class SyncWithASCommand extends ContainerAwareCommand
             }
 
             $output->writeln("\n\n");
-            sleep(2);
+            sleep(4);
         }
 
 
