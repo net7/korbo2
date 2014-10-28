@@ -71,6 +71,7 @@ define([
 
     Manager.store.addByValue('fq', 'basket_id_s:' + basket_id);
     Manager.store.addByValue('q', '*:*');
+
     var params = {
       facet: true,
 	'facet.field': [ 'resource_s', 'type_ss', 'label_ss'],

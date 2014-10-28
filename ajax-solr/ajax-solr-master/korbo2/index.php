@@ -69,6 +69,15 @@
       <h2>Resources</h2>
       <div class="tagcloud" id="resource_s"></div>
 -->
+      <h2>Download reports</h2>
+      <div class="tagckoud">
+	<a href="downloadReportTbiMysql.php">Download TBI</a><br/>
+	<a href="downloadReportAi.php">Download AI</a>
+      </div>
+
+      
+
+      
 
       <div class="clear"></div>
     </div>
@@ -87,20 +96,21 @@
 
               $('#busy').show();
 
-              $.ajax({
+      $.ajax({
                  type: "DELETE",
-                  url: "/v1/baskets/null/items/"+ id,
+                  url: "http://korbo2.org/app_dev.php/v1/baskets/null/items/"+ id,
                  data: "name=someValue",
               success: function(msg){
                      alert("The Item was successfully deleted");
                     $('.result_' + id).fadeOut(1000);
               },
-              error: function(textStatus, errorThrown) {
-                  console.log(textStatus, errorThrown);
-                  alert("Some problem arose while deleting the item!");
-              },
+              //error: function(textStatus, errorThrown) {
+              //    console.log(textStatus, errorThrown);
+              //    alert("Some problem arose while deleting the item!");
+              //},
               complete: function(){
                   $('#busy').hide();
+                  $('.result_' + id).fadeOut(1000);
               }
 
           })};

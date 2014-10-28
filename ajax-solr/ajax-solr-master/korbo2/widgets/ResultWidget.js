@@ -80,7 +80,7 @@ AjaxSolr.ResultWidget = AjaxSolr.AbstractWidget.extend({
 //      snippet += doc.dateline + ' ' + doc.text;
 //    }
        var abstract = '';
-
+      
       if (typeof(doc.abstract_txt)!='undefined'){
 //          if (doc.abstract_txt.length > 1){
               abstract = doc.abstract_txt[0];
@@ -109,10 +109,17 @@ AjaxSolr.ResultWidget = AjaxSolr.AbstractWidget.extend({
 	  label =  doc.label_ss ;
         }
       }
+      var types = new Array();
+      if (typeof(doc.type_ss)!='undefined'){
+	  for (i in doc.type_ss) {
+	      var n = doc.type_ss[i].lastIndexOf('/');
+	      types.push(doc.type_ss[i].substring(n + 1));
+	  }
+      }
     var output = '<div class="result_'+doc.id+'"><h2>' + label + '</h2>';
     output += '<p id="links_' + doc.id + '" class="links"></p>';
     output += '<p>' + snippet + '</p>';
-
+      output += '<p style="color: red;">' + types.join(" - ") + '</p>';
 
     //output += '<p><a href="javascript:window[obj].callEdit('+doc.id+')">EDIT</a></p>';
     output += '<p>' +
