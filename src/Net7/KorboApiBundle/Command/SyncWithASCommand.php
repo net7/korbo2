@@ -123,7 +123,7 @@ class SyncWithASCommand extends ContainerAwareCommand
         $queryInsert = 'WITH <http://purl.org/pundit/as/graph/itemsGraph-' . $annotation["annotationId"] . '> ' .
         //$queryInsert = 'WITH <http://purl.org/pundit/demo-cloud-server/graph/itemsGraph-' . $annotation["annotationId"] . '> ' .
             'DELETE { <' . $item->getUri() . '> ?p ?o } ' .
-            'INSERT { <' . $item->getUri() . '>  <http://www.w3.org/2000/01/rdf-schema#label> "' . $item->getLabelTranslated() .  'AAAAAAAAAAAA2" . ' .
+            'INSERT { <' . $item->getUri() . '>  <http://www.w3.org/2000/01/rdf-schema#label> "' . $item->getLabelTranslated() .  '" . ' .
             '<' . $item->getUri() .  '>  <http://www.w3.org/2004/02/skos/core#label> "' . $item->getLabelTranslated() . '" . ' .
             '<' . $item->getUri() . '>  <http://purl.org/dc/elements/1.1/description> "' .  preg_replace( "/\r|\n/", "", $item->getAbstractTranslated() ) .  '" . ' .
             '<' . $item->getUri() . '>  <http://xmlns.com/foaf/0.1/depiction> "'  .  $item->getDepiction() . '" . ' .
