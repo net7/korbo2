@@ -53,6 +53,10 @@ class GetItemUsageCommand extends ContainerAwareCommand
             throw $e;
         }
 
+        if ($this->itemToDelete == null) {
+            $output->writeln("\nWARNING: The item ". $this->itemIdToDelete . " does not exist!!\n");
+        }
+
         $output->writeln('Executing check...');
 
         if (($message = $this->checkItemsConsistency()) !== true) {
@@ -61,7 +65,9 @@ class GetItemUsageCommand extends ContainerAwareCommand
         }
 
         // call DL API -- returns the list of elements to merge
-        $elementListUrl = $this->dlGetApiUrl . '?uri=' . $this->itemToDelete->getUri();
+        $uri = ($this->itemToDelete == null) ? $this->getContainer()->getParameter('korbo_base_purl_uri') . $this->itemIdToDelete : $this->itemToDelete->getUri();
+
+        $elementListUrl = $this->dlGetApiUrl . '?uri=' . $uri;
         $elementsToMergeRequest = $this->doApiRequest($elementListUrl, true);
 
         // something went wrong (not reachable, api error)
@@ -71,11 +77,12 @@ class GetItemUsageCommand extends ContainerAwareCommand
 
         $elementsToMerge = json_decode($elementsToMergeRequest, true);
 
-        $output->writeln("\nThe following elements containing the uri {$this->itemToDelete->getUri()}: \n");
+        if (count($elementsToMerge ) > 0) $output->writeln("\nThe following elements containing the uri {$uri}: \n");
+        else $output->writeln("\nThe element {$uri} is not present into the DL \n");
         // display the modification to make
         foreach ($elementsToMerge as $element) {
             foreach ($element['fields'] as $field => $values) {
-                if ($values['uri'] == $this->itemToDelete->getUri()) {
+                if ($values['uri'] == $uri) {
                     $output->writeln($element['id'] . ' ' . $element['slug']);
                     $output->writeln($field . ' : ' . $values['label']);
                 }
@@ -87,7 +94,7 @@ class GetItemUsageCommand extends ContainerAwareCommand
         $annotations = $this->getAnnotations();
         //print_r($annotations);die;
         if (count($annotations) > 0) {
-            $output->writeln("\nThe the uri {$this->itemToDelete->getUri()} is present in the following annotations: \n");
+            $output->writeln("\nThe the uri {$uri} is present in the following annotations: \n");
         }
         else {
             $output->writeln("\nYou are lucky... no annotations found! \n");
@@ -105,7 +112,7 @@ class GetItemUsageCommand extends ContainerAwareCommand
     private function getAnnotations() {
         //TODO: sostituire con uri da eliminare....
         //$uri = 'http://purl.org/net7/dev.korbo2/item/41';
-        $uri = $this->itemToDelete->getUri();
+        $uri = ($this->itemToDelete == null) ? $this->getContainer()->getParameter('korbo_base_purl_uri') . $this->itemIdToDelete : $this->itemToDelete->getUri();
 
         $annotations = array();
 
@@ -199,7 +206,7 @@ EOT;
     private function setUpEnvironment(InputInterface $input) {
 
         $basketId = $input->getArgument('basket-id');
-        $itemIdToDelete = $input->getArgument('item-id');
+        $this->itemIdToDelete = $input->getArgument('item-id');
         $basketId = $input->getArgument('basket-id');
         $this->dlGetApiUrl = $input->getArgument('dl-get-api');
         $this->asSesameBaseApiUrl = $input->getArgument('as-sesame-api-base-url');
@@ -208,15 +215,17 @@ EOT;
         $this->em = $this->getContainer()->get('doctrine')->getEntityManager();
         $this->logger = $this->getContainer()->get('logger');
 
-        $this->itemToDelete = $this->em->find("Net7KorboApiBundle:Item", $itemIdToDelete);
+        $this->itemToDelete = $this->em->find("Net7KorboApiBundle:Item", $this->itemIdToDelete);
 
-        if ($this->itemToDelete == null) {
-            throw new Exception("Item " . $itemIdToDelete . ' does not exist');
-            return;
+//        if ($this->itemToDelete == null) {
+//            throw new Exception("Item " . $itemIdToDelete . ' does not exist');
+//            return;
+//        }
+
+        if ($this->itemToDelete != null) {
+            $this->itemToDelete->setTranslatableLocale("en");
+            $this->itemToDelete->setBaseItemUri($this->getContainer()->getParameter('korbo_base_purl_uri'));
         }
-
-        $this->itemToDelete->setTranslatableLocale("en");
-        $this->itemToDelete->setBaseItemUri($this->getContainer()->getParameter('korbo_base_purl_uri'));
 
         $this->basket       = $this->em->find("Net7KorboApiBundle:Basket", $basketId);
     }
@@ -227,11 +236,8 @@ EOT;
             return "NO Basket found";
         }
 
-        if ($this->itemToDelete === null) {
-            return "Item to delete not found";
-        }
 
-        if ($this->itemToDelete->getBasketId() != $this->basket->getId()) {
+        if ($this->itemToDelete && $this->itemToDelete->getBasketId() != $this->basket->getId()) {
             return "The item to delete does not belong to the basket passed as parameter";
         }
 
