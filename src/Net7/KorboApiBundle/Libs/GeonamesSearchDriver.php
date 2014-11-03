@@ -64,12 +64,13 @@ class GeonamesSearchDriver extends AbstractSearchDriver {
     public function search($wordToSearch)
     {
 
-        $coords = explode("||", $wordToSearch);
+        //$coords = explode("||", $wordToSearch);
 
         // TODO add start / limit parameter to search url
         $results = array();
 
-        $res = $this->doGeonamesRequest($coords[0], $coords[1], $wordToSearch);
+//        $res = $this->doGeonamesRequest($coords[0], $coords[1], $wordToSearch);
+        $res = $this->doGeonamesRequest($wordToSearch);
 
         $arrayResult = json_decode($res, true);
 
@@ -79,14 +80,14 @@ class GeonamesSearchDriver extends AbstractSearchDriver {
 
             $results[] = array(
                 'available_languages' => array("mul"),  // available languages for dandelion - de | en | fr | it | pt -
-                'id'                  => $result['wikipediaUrl'],
+                'id'                  => (array_key_exists("geoNameId", $result)) ? $result['geoNameId'] : substr(strrchr($result['wikipediaUrl'], "/"), 1),
                 'uri'                 => $result['wikipediaUrl'],
                 'basket_id'           => null,
-                'depiction'           => (array_key_exists("thumbnail", $result)) ? $result['thumbnail'] : '',
+                'depiction'           => (array_key_exists("thumbnailImg", $result)) ? $result['thumbnailImg'] : '',
                 'abstract'            => $result['summary'],
                 'resource'            => $result['wikipediaUrl'],
                 'label'               => $result['title'],
-                'type'                => (!empty($result["types"])) ? $result["types"] : array("http://www.w3.org/2002/07/owl#Thing")
+                'type'                => (!empty($result["feature"])) ? array($result["feature"]) : array("http://www.w3.org/2002/07/owl#Thing")
             );
         }
 
@@ -139,21 +140,18 @@ class GeonamesSearchDriver extends AbstractSearchDriver {
 
     }
 
-    protected function doGeonamesRequest($lat, $lng, $word = '') {
+    protected function doGeonamesRequest($word) {
         $params = $this->extraParameters;
 
         $word = urlencode(str_replace('"', '', trim($word)));
-        $requestUrl = $this->geonamesBaseUrl . '?lat=' . $lat
-            . '&lng=' . $lng .
-            '&username=' . $this->geonamesUsername .
-            '&radius=15'   // TODO set radius as parameter
-            ;
+        $requestUrl = $this->geonamesBaseUrl . $word . '&username=' . $this->geonamesUsername;
+
 
         $contentType = (isset($params['content-type'])) ? $params['content-type'] : 'application/json';
 
         //limit
-        $requestUrl .= (isset($params['limit'])) ? "&limit=" . $params['limit'] : '';
-        $requestUrl .= (isset($params['offset'])) ? "&offset=" . $params['offset'] : '';
+        $requestUrl .= (isset($params['limit'])) ? "&maxRows=" . $params['limit'] : '';
+        $requestUrl .= (isset($params['offset'])) ? "&startRow=" . $params['offset'] : '';
 
         //die ("a " . $requestUrl);
 

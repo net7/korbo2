@@ -58,7 +58,7 @@ class SearchDriverFactory {
                 break;
             case "geonames":
                 $instance = new GeonamesSearchDriver(
-                    $container->getParameter('geonames_search_base_url'),
+                    $container->getParameter('geonames_fulltext_search_base_url'),
                     $container->getParameter('geonames_username'),
                     $baseApiPath,
                     $options
