@@ -31,8 +31,8 @@ define([
 ], function () {
   $(function () {
     Manager = new AjaxSolr.Manager({
-	solrUrl: 'http://thepund.it:8080/korbo2-solr/collection1/'
-//	solrUrl: 'http://localhost:8983/solr/collection1/'
+	solrUrl: 'http://as.thepund.it:8080/korbo2-solr/collection1/'
+	//solrUrl: 'http://localhost:8983/solr/collection1/'
     });
     Manager.addWidget(new AjaxSolr.ResultWidget({
       id: 'result',
@@ -71,7 +71,6 @@ define([
 
     Manager.store.addByValue('fq', 'basket_id_s:' + basket_id);
     Manager.store.addByValue('q', '*:*');
-
     var params = {
       facet: true,
 	'facet.field': [ 'resource_s', 'type_ss', 'label_ss'],
