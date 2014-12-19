@@ -63,7 +63,7 @@ define([
     Manager.addWidget(new AjaxSolr.AutocompleteWidget({
       id: 'text',
       target: '#search',
-      fields: ['type_ss', 'resource_s' ,'label_ss', 'abstract_txt' ]
+      fields: ['id', 'type_ss', 'resource_s' ,'label_ss', 'abstract_txt' ]
     }));
 
     Manager.init();
