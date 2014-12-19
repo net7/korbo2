@@ -12,11 +12,12 @@ $response = json_decode($solrRequest, true);
 
 $fp = fopen('/tmp/ai.csv', 'w');
 
+fputcsv($fp, array("label", "korbo-uri", "resource", "description"));
 
 foreach ($response["response"]["docs"] as $item) {
 //    print_r($item);die;
 
-    $fields = array($item["label_ss"][0], "http://purl.org/net7/korbo/item/" . $item["id"], $item["resource_s"]);
+    $fields = array($item["label_ss"][0], "http://purl.org/net7/korbo/item/" . $item["id"], $item["resource_s"], $item["abstract_txt"][0]);
     
     fputcsv($fp, $fields);
 }
