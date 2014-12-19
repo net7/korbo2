@@ -15,20 +15,19 @@ $password="mda9858ip";
 $database="korbo2";
 
 $fp = fopen('/tmp/tbi.csv', 'w');
-//fprintf($fp, chr(0xEF).chr(0xBB).chr(0xBF));
-//fwrite($fp, "xEFxBBxBF");
-fputcsv($fp, array("label", "korbo-uri", "artist", "location", "year", "zeri", "url", "description"));
+
+    fputcsv($fp, array("label", "korbo-uri", "artist", "location", "year", "zeri", "url", "description"));
 
 header('Content-Type: text/html; charset=utf-8');
 
 
-$con=mysqli_connect("localhost",$user,$password,"korbo2");
+$con = mysql_connect("localhost", $user,  $password);
+mysql_query("SET character_set_results=utf8", $con);
+mb_language('uni');
+mb_internal_encoding('UTF-8');
+mysql_select_db('korbo2', $con);
 
-    mysql_query("SET character_set_results=utf8", $con);
-    mb_language('uni');
-    mb_internal_encoding('UTF-8');
-
-$result = mysqli_query($con, "SELECT" . 
+    $result = mysql_query("SELECT" .
 "    t.content as LABEL,".
 "    CONCAT('http://purl.org/net7/korbo2/item/',i.id) as korbo_uri,".
 "    t1.content as content".
@@ -39,9 +38,9 @@ $result = mysqli_query($con, "SELECT" .
 "  AND i.type like '%artwork-tbi-bi%' ".
 "  AND t.field='label' AND t.locale='EN'".
 "  AND t1.field='abstract' AND t1.locale='EN'".
-"  ORDER BY ID") or die( "Impossibile effettuare la quer.");
+"  ORDER BY i.id") or die( "Impossibile effettuare la query." . mysql_error());
 
- while($row = mysqli_fetch_array($result)) {
+ while($row = mysql_fetch_assoc($result)) {
     $s = $row['content'];
     preg_match_all("/^ARTIST:(.*)$/m",$s,$artist);
     preg_match_all("/^LOCATION:(.*)$/m",$s,$location);
