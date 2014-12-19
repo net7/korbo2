@@ -19,7 +19,14 @@ $fp = fopen('/tmp/tbi.csv', 'w');
 //fwrite($fp, "xEFxBBxBF");
 fputcsv($fp, array("label", "korbo-uri", "artist", "location", "year", "zeri", "url", "description"));
 
+header('Content-Type: text/html; charset=utf-8');
+
+
 $con=mysqli_connect("localhost",$user,$password,"korbo2");
+
+    mysql_query("SET character_set_results=utf8", $con);
+    mb_language('uni');
+    mb_internal_encoding('UTF-8');
 
 $result = mysqli_query($con, "SELECT" . 
 "    t.content as LABEL,".
@@ -32,7 +39,7 @@ $result = mysqli_query($con, "SELECT" .
 "  AND i.type like '%artwork-tbi-bi%' ".
 "  AND t.field='label' AND t.locale='EN'".
 "  AND t1.field='abstract' AND t1.locale='EN'".
-"  AND i.id NOT IN  (946,1516,1174,1114,1155,1519,1501,1515,1157,1521,1499,1190,1493,1524,1526,1108,1489,1491,1490,1492,1513,1510,1511,1532,1498,1353,1347,1512,1494,1185,1184,959,953,1500,1128,1502,1527) ORDER BY LABEL") or die( "Impossibile effettuare la quer.");
+"  ORDER BY ID") or die( "Impossibile effettuare la quer.");
 
  while($row = mysqli_fetch_array($result)) {
     $s = $row['content'];
